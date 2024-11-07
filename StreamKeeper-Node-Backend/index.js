@@ -1,5 +1,5 @@
 require('dotenv').config();
-console.log('TMDB_BASE_URL:', process.env.TMDB_BASE_URL);
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
