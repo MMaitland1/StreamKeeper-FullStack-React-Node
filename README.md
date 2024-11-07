@@ -85,17 +85,17 @@ StreamKeeper is a full-stack application designed for movie and TV show enthusia
 
 ## Technology Stack
 
-- **Backend:**  
-  - Node.js
-  - Express.js
-  - Axios (for API requests)
-  - Swagger (for API documentation)
-
 - **Frontend:**  
   - React
   - Context API (for state management)
   - Axios (for API calls)
   - Jest and React Testing Library (for testing)
+
+- **Backend:**  
+  - Node.js
+  - Express.js
+  - Axios (for API requests)
+  - Swagger (for API documentation)
 
 - **Additional Tools:**  
   - dotenv (for environment variables in the backend)
