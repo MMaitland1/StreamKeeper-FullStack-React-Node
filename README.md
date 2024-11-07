@@ -5,19 +5,41 @@ StreamKeeper is a full-stack application designed for movie and TV show enthusia
 
 ## Key Features
 
-### Backend (Node.js API)
-- **Multi-Server Architecture**: Separate endpoints for movies, TV shows, persons, and general TMDb queries, enhancing modularity and scalability.
-- **Swagger-Documented Endpoints**: Provides user-friendly documentation for exploring and testing available routes.
-- **Flexible Search**: Powerful search functionality to query movies, TV shows, and persons with optimized query handling.
-- **Comprehensive Error Handling**: Ensures seamless API responses and user experience.
-- **Health Check Routes**: Easy monitoring and validation of API status.
+## Backend (Node.js API)
+- **Multi-Server Architecture**:  
+  The API is modularized into separate servers handling specific routes for movies, TV shows, persons, and general TMDb queries. This separation enhances modularity, maintainability, and scalability, allowing easy upgrades or modifications for individual components.
+- **Swagger-Documented Endpoints**:  
+  Provides a detailed and user-friendly interface for exploring and testing available routes within the API. This documentation improves developer experience and ensures a clear understanding of available operations.
+- **Flexible Search Functionality**:  
+  A powerful search feature enables optimized and flexible querying of movies, TV shows, and persons from the database. Search queries are handled efficiently to ensure accurate and fast results.
+- **Comprehensive Error Handling**:  
+  Robust error handling mechanisms ensure consistent and informative API responses, contributing to a seamless user experience and easier debugging.
+- **Health Check Routes**:  
+  Built-in health check endpoints offer simple and effective monitoring and validation of API status and availability.
+  
+## Frontend (React)
+- **Responsive Design**:  
+  The frontend is built with responsive design principles to ensure it adapts gracefully to various devices, including desktops, tablets, and mobile devices. Users experience a consistent and optimized interface regardless of screen size.
+- **Real-Time Search**:  
+  Features an interactive search bar for quick searches of movies, TV shows, and people. The search provides instant results, improving user engagement and experience.
+- **Detailed Media Pages**:  
+  Users can access comprehensive information on movies and TV shows, including ratings, reviews, trailers, and related content. This provides an enriched media experience.
+- **Efficient Caching Mechanism**:  
+  The frontend utilizes caching to reduce redundant API calls, improving load times and ensuring a faster, smoother user experience.
+- **User-Friendly Navigation**:  
+  The navigation system is designed to be intuitive, with clear links for browsing content, searching, and viewing specific details. This makes the application easy to use for all users.
 
-### Frontend (React)
-- **Responsive Design**: Adapts gracefully to desktops, tablets, and mobile devices, offering a consistent user experience.
-- **Real-Time Search**: Interactive search bar to quickly find movies, TV shows, and people, providing instant results.
-- **Detailed Media Pages**: Access in-depth information, ratings, reviews, trailers, and related content for each movie and show.
-- **Efficient Caching Mechanism**: Reduces redundant API calls, improving load times and user experience.
-- **User-Friendly Navigation**: Intuitive design with clear navigation links for browsing content, searching, and viewing specific details.
+## Microservices
+- **Scalable Architecture**:  
+  Each service operates independently, handling a distinct domain, such as movies, TV shows, or user data. This isolation supports horizontal scaling, making it easier to deploy, maintain, and upgrade individual services without affecting the overall system.
+- **Service Communication**:  
+  Microservices communicate via lightweight, standardized protocols (e.g., REST, gRPC, or message queues). This ensures efficient data exchange and minimizes coupling between services.
+- **Load Balancing**:  
+  Traffic is evenly distributed across multiple services, providing fault tolerance and optimizing resource usage. Load balancers ensure high availability and consistent performance.
+- **Independent Deployment**:  
+  Services can be developed, deployed, and maintained independently. This accelerates development cycles and supports continuous integration and deployment (CI/CD) practices.
+- **Dedicated Databases**:  
+  Each microservice may have its dedicated database, ensuring optimal data modeling and reducing potential conflicts with other services.
 
 ## Technology Stack
 - **Backend**: Node.js, Express.js, Axios for API requests, and Swagger for API documentation.
