@@ -129,7 +129,7 @@ To get started with StreamKeeper, follow these instructions:
 
 Make sure you have the following installed:
 
-- Node.js (version X.X.X or higher)
+- Node.js 
 - npm (Node Package Manager)
 
 ### Installation
