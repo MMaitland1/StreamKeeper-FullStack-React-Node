@@ -1,5 +1,7 @@
 // helpers/tmdbHelper.js
 require('dotenv').config();
+
+
 const axios = require('axios');
 
 const tmdbApiKey = process.env.TMDB_API_KEY;
