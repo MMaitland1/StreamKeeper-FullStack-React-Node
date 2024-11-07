@@ -251,44 +251,6 @@ Ensure you have the following installed on your machine:
 
    Replace `your_tmdb_api_key` with a valid TMDb API key. You can obtain one by signing up at [The Movie Database](https://www.themoviedb.org/).
 
-
-# Streamkeeper Application
-
-Streamkeeper is a multi-server backend application that provides APIs for accessing TMDb data for general, movies, TV shows, and persons.
-
----
-
-## Prerequisites
-
-Make sure you have the following installed:
-
-- **Node.js** (version >= 12.x recommended)
-- **npm** (Node package manager)
-
----
-
-## Installation
-
-### Method 1: Running Each Server Separately
-
-Clone the repository:
-
-```bash
-git clone <repository-url>
-```
-
-Navigate to the project directory:
-
-```bash
-cd <project-directory>
-```
-
-Install dependencies:
-
-```bash
-npm install
-```
-
 ### Running the Applications
 
 The backend is divided into multiple servers, each handling specific routes. Open separate terminal windows or tabs for each server and run the following commands:
