@@ -1,4 +1,9 @@
 body {
-  background: linear-gradient(to bottom right, rgb(75, 75, 75), black);
-  color : white;
+  --rotation-angle: 0deg; /* Initial variable for rotation */
+  background: linear-gradient(var(--rotation-angle), rgb(75, 75, 75), black);
+  transition: background 0.1s linear; /* Smooth transition for background */
+  color: white;
+  margin: 0;
+  padding: 0;
+
 }

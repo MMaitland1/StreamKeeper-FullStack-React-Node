@@ -44,7 +44,9 @@ function MovieDetailPage() {
     // Fetch recommendations and similar movies
     const fetchRecommendationsAndSimilarMovies = async () => {
       try {
-        const recommendationsData = await MainService.getMovieRecommendations(id); // Fetch movie recommendations
+        const recommendationsData = await MainService.getMovieRecommendations(
+          id
+        ); // Fetch movie recommendations
         const formattedRecommendations = (recommendationsData || []).map(
           (movieData) => new Movie(movieData)
         );
@@ -56,7 +58,10 @@ function MovieDetailPage() {
         );
         setSimilarMovies(formattedSimilarMovies);
       } catch (error) {
-        console.error("Error fetching recommendations and similar movies:", error);
+        console.error(
+          "Error fetching recommendations and similar movies:",
+          error
+        );
       }
     };
 
@@ -93,7 +98,11 @@ function MovieDetailPage() {
             <img
               src={movie?.posterUrl || "placeholder.jpg"} // Display movie poster or a placeholder image
               alt={movie?.title || "Movie Poster"}
-              style={{ width: "100%", borderRadius: "8px", boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.6)'  }}
+              style={{
+                width: "100%",
+                borderRadius: "8px",
+                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.6)",
+              }}
             />
           </Box>
           {/* Display watch providers */}
@@ -104,15 +113,26 @@ function MovieDetailPage() {
         <Grid item xs={12} md={8}>
           <Typography variant="h4" gutterBottom style={{ color: titleColor }}>
             {movie?.title || "N/A"}{" "}
-            <Typography variant="subtitle1" component="span" style={{ color: titleColor }}>
-              ({movie?.releaseDate ? movie.releaseDate.split("-")[0] : "Unknown"}) {/* Display release year */}
+            <Typography
+              variant="subtitle1"
+              component="span"
+              style={{ color: titleColor }}
+            >
+              (
+              {movie?.releaseDate ? movie.releaseDate.split("-")[0] : "Unknown"}
+              ) {/* Display release year */}
             </Typography>
           </Typography>
-          <Typography variant="subtitle1" gutterBottom style={{ color: titleColor }}>
+          <Typography
+            variant="subtitle1"
+            gutterBottom
+            style={{ color: titleColor }}
+          >
             Original Title: {movie?.originalTitle || "N/A"}
           </Typography>
           <Typography variant="body1" paragraph style={{ color: textColor }}>
-            {movie?.overview || "No overview available."} {/* Display movie overview */}
+            {movie?.overview || "No overview available."}{" "}
+            {/* Display movie overview */}
           </Typography>
 
           {/* Display movie information in a grid */}
@@ -143,19 +163,20 @@ function MovieDetailPage() {
                 </Typography>
                 {/* Display movie rating */}
                 <Rating
-  name="read-only"
-  value={movie?.voteAverage / 2 || 0} // Convert 10-point scale to 5-point scale for display
-  readOnly
-  precision={0.1}
-  sx={{
-    "& .MuiRating-icon": {
-      filter: "drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.6))", // Adding a drop shadow effect
-    },
-  }}
-/>
+                  name="read-only"
+                  value={movie?.voteAverage / 2 || 0} // Convert 10-point scale to 5-point scale for display
+                  readOnly
+                  precision={0.1}
+                  sx={{
+                    "& .MuiRating-icon": {
+                      filter: "drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.6))", // Adding a drop shadow effect
+                    },
+                  }}
+                />
 
                 <Typography variant="body1" style={{ color: textColor }}>
-                  {movie?.voteAverage ? movie.voteAverage.toFixed(1) : "N/A"} / 10
+                  {movie?.voteAverage ? movie.voteAverage.toFixed(1) : "N/A"} /
+                  10
                 </Typography>
               </Grid>
               <Grid item xs={6}>
@@ -172,10 +193,17 @@ function MovieDetailPage() {
           {/* Display genres if available */}
           {movie?.genreIds && movie.genreIds.length > 0 && (
             <Box my={2}>
-              <Typography variant="h6" style={{ color: titleColor }}>Genres</Typography>
+              <Typography variant="h6" style={{ color: titleColor }}>
+                Genres
+              </Typography>
               <Box display="flex" flexWrap="wrap" gap={1}>
                 {movie.genreIds.map((genreId) => (
-                  <Chip key={genreId} label={`Genre ${genreId}`} variant="outlined" style={{ color: titleColor }} />
+                  <Chip
+                    key={genreId}
+                    label={`Genre ${genreId}`}
+                    variant="outlined"
+                    style={{ color: titleColor }}
+                  />
                 ))}
               </Box>
             </Box>
@@ -184,7 +212,9 @@ function MovieDetailPage() {
           {/* Display backdrop image if available */}
           {movie?.backdropUrl && (
             <Box my={2}>
-              <Typography variant="h6" style={{ color: titleColor }}>Backdrop</Typography>
+              <Typography variant="h6" style={{ color: titleColor }}>
+                Backdrop
+              </Typography>
               <img
                 src={movie.backdropUrl}
                 alt={`${movie.title} backdrop`}
@@ -192,7 +222,7 @@ function MovieDetailPage() {
                   width: "100%",
                   borderRadius: "8px",
                   marginTop: "10px",
-                  boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.6)' 
+                  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.6)",
                 }}
               />
             </Box>

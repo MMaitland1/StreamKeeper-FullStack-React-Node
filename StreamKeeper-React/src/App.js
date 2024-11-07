@@ -1,6 +1,6 @@
 // src/App.js
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
 import HomePage from './pages/HomePage';
@@ -10,6 +10,7 @@ import TvShowDetailPage from './pages/TvShowDetailPage';
 import PersonDetailPage from './pages/PersonDetailPage';
 import BrowsePage from './pages/BrowsePage';
 import InfoDisplayPage from './pages/InfoDisplayPage'; // Import InfoDisplayPage
+import './App.css';
 
 // ScrollToTop component to handle scrolling to the top on route change
 function ScrollToTop() {
@@ -22,10 +23,28 @@ function ScrollToTop() {
   return null;
 }
 
+// Component for rotating background
+function RotatingBackground() {
+  useEffect(() => {
+    let angle = 0;
+    const increment = .2; // Controls speed of rotation (adjust as needed)
+    const interval = setInterval(() => {
+      angle = (angle + increment) % 360; // Keep angle in 0-359 degrees
+      document.body.style.setProperty('--rotation-angle', `${angle}deg`);
+    }, 40); // Time interval in milliseconds (adjust for smoother/faster rotation)
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, []);
+
+  return null;
+}
+
 function App() {
   return (
     <Router>
-      <Navbar  />
+      <RotatingBackground /> {/* Add rotating background functionality */}
+      <Navbar />
       <ScrollToTop />
       <div style={{ padding: '20px' }}>
         <Routes>

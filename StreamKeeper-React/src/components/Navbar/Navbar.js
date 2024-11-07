@@ -87,7 +87,7 @@ function Navbar() {
     <>
       <AppBar
         position="static"
-        sx={{ background: 'linear-gradient(45deg, black, red)', borderRadius: '12px' }}
+        sx={{ background: 'linear-gradient(120deg, black, #f20000)  ' , borderRadius: '12px'  }}
       >
         <Toolbar sx={{ borderRadius: '8px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)' }}> {/* Drop shadow for Toolbar */}
           <img
