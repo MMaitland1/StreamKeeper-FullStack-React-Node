@@ -92,26 +92,26 @@ The application requires the following environment variables:
 ```
 project-directory/
 ├── controllers/
-│   ├── movieController.js       // Controller for handling movie-related routes and logic
-│   ├── personController.js      // Controller for handling person-related routes and logic
-│   ├── tvShowController.js      // Controller for handling TV show-related routes and logic
-│   └── tmdbController.js        // Controller for handling routes and logic related to The Movie Database (TMDb) API
+│   ├── movieController.js       #  Controller for handling movie-related routes and logic
+│   ├── personController.js      #  Controller for handling person-related routes and logic
+│   ├── tvShowController.js      #  Controller for handling TV show-related routes and logic
+│   └── tmdbController.js        #  Controller for handling routes and logic related to The Movie Database (TMDb) API
 ├── helpers/
-│   └── tmdbHelper.js            // Helper functions for interacting with the TMDb API
+│   └── tmdbHelper.js            #  Helper functions for interacting with the TMDb API
 ├── models/
-│   ├── Media.js                 // Base model representing common attributes of different media types
-│   ├── Movie.js                 // Model representing a Movie, extending or inheriting from Media
-│   ├── Person.js                // Model representing a Person (e.g., actor, director)
-│   ├── Review.js                // Model representing user reviews for media items
-│   └── TVShow.js                // Model representing a TV Show, extending or inheriting from Media
+│   ├── Media.js                 #  Base model representing common attributes of different media types
+│   ├── Movie.js                 #  Model representing a Movie, extending or inheriting from Media
+│   ├── Person.js                #  Model representing a Person (e.g., actor, director)
+│   ├── Review.js                #  Model representing user reviews for media items
+│   └── TVShow.js                #  Model representing a TV Show, extending or inheriting from Media
 ├── routes/
-│   ├── movies.js                // Route definitions and endpoints for movie-related operations
-│   ├── persons.js               // Route definitions and endpoints for person-related operations
-│   ├── tvShows.js               // Route definitions and endpoints for TV show-related operations
-│   └── tmdb.js                  // Route definitions and endpoints for TMDb API-related operations
+│   ├── movies.js                #  Route definitions and endpoints for movie-related operations
+│   ├── persons.js               #  Route definitions and endpoints for person-related operations
+│   ├── tvShows.js               #  Route definitions and endpoints for TV show-related operations
+│   └── tmdb.js                  #  Route definitions and endpoints for TMDb API-related operations
 ├── swagger/
-│   └── swagger.js               // Swagger configuration for API documentation
-└── index.js                     // Main entry point of the application
+│   └── swagger.js               #  Swagger configuration for API documentation
+└── index.js                     #  Main entry point of the application
 
 ```
 
