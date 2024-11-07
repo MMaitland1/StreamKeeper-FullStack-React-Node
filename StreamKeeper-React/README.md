@@ -120,7 +120,7 @@ streamkeeper-react/
 ├── package-lock.json                                # Lock file for npm packages
 ├── package.json                                     # Project metadata and dependencies
 └── README.md                                        # Project documentation
-
+```
 ## Getting Started
 
 To get started with StreamKeeper, follow these instructions:
@@ -131,7 +131,7 @@ Make sure you have the following installed:
 
 - Node.js (version X.X.X or higher)
 - npm (Node Package Manager)
- ```
+
 ### Installation
 
 1. **Clone the repository**:
