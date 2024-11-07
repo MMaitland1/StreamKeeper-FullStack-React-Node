@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TMDb API Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .container { max-width: 800px; margin: auto; }
+    .section { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+    label, button { display: block; margin: 10px 0; }
+    input { padding: 8px; width: 100%; }
+    button { padding: 10px 15px; cursor: pointer; }
+    pre { background: #f9f9f9; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>TMDb API Testing Dashboard</h1>
+
+    <!-- TMDb API Validation and Multi-Search -->
+    <div class="section">
+      <h2>TMDb API - General Validation & Multi-Search</h2>
+      <button onclick="validateAPI(3001)">Validate TMDb API</button>
+      <label>Search Query:</label>
+      <input type="text" id="multiSearchQuery" placeholder="e.g., Inception">
+      <button onclick="multiSearch()">Multi-Search</button>
+      <pre id="tmdbOutput"></pre>
+    </div>
+
+    <!-- Movie API Validation and Popular Movies -->
+    <div class="section">
+      <h2>Movie API</h2>
+      <button onclick="validateAPI(3002)">Validate Movie API</button>
+      <label>Movie ID:</label>
+      <input type="text" id="movieId" placeholder="e.g., 550 (Fight Club)">
+      <button onclick="fetchMovieDetails()">Get Movie Details</button>
+      <button onclick="fetchPopularMovies()">Get Popular Movies</button>
+      <pre id="movieOutput"></pre>
+    </div>
+
+    <!-- TV Show API Validation and Popular Shows -->
+    <div class="section">
+      <h2>TV Show API</h2>
+      <button onclick="validateAPI(3003)">Validate TV Show API</button>
+      <label>TV Show ID:</label>
+      <input type="text" id="tvId" placeholder="e.g., 1399 (Game of Thrones)">
+      <button onclick="fetchTVDetails()">Get TV Show Details</button>
+      <button onclick="fetchPopularTVShows()">Get Popular TV Shows</button>
+      <pre id="tvOutput"></pre>
+    </div>
+
+    <!-- Person API Validation and Details -->
+    <div class="section">
+      <h2>Person API</h2>
+      <button onclick="validateAPI(3004)">Validate Person API</button>
+      <label>Person ID:</label>
+      <input type="text" id="personId" placeholder="e.g., 287 (Brad Pitt)">
+      <button onclick="fetchPersonDetails()">Get Person Details</button>
+      <pre id="personOutput"></pre>
+    </div>
+  </div>
+
+  <script>
+    const baseUrl = 'http://localhost';
+
+    // Validate API by checking each server's health endpoint
+    async function validateAPI(port) {
+      try {
+        const response = await fetch(`${baseUrl}:${port}/api/health`);
+        const data = await response.json();
+        document.getElementById(`${getOutputId(port)}`).innerText = `Validation: ${JSON.stringify(data, null, 2)}`;
+      } catch (error) {
+        document.getElementById(`${getOutputId(port)}`).innerText = `Error validating API: ${error.message}`;
+      }
+    }
+
+    // TMDb Multi-Search
+    async function multiSearch() {
+      const query = document.getElementById('multiSearchQuery').value;
+      try {
+        const response = await fetch(`${baseUrl}:3001/api/search/multi?query=${query}`);
+        const data = await response.json();
+        document.getElementById('tmdbOutput').innerText = JSON.stringify(data, null, 2);
+      } catch (error) {
+        document.getElementById('tmdbOutput').innerText = `Error: ${error.message}`;
+      }
+    }
+
+    // Movie API - Fetch Movie Details
+    async function fetchMovieDetails() {
+      const movieId = document.getElementById('movieId').value;
+      try {
+        const response = await fetch(`${baseUrl}:3002/api/movies/${movieId}`);
+        const data = await response.json();
+        document.getElementById('movieOutput').innerText = JSON.stringify(data, null, 2);
+      } catch (error) {
+        document.getElementById('movieOutput').innerText = `Error: ${error.message}`;
+      }
+    }
+
+    // Movie API - Fetch Popular Movies
+    async function fetchPopularMovies() {
+      try {
+        const response = await fetch(`${baseUrl}:3002/api/movies/popular`);
+        const data = await response.json();
+        document.getElementById('movieOutput').innerText = JSON.stringify(data, null, 2);
+      } catch (error) {
+        document.getElementById('movieOutput').innerText = `Error: ${error.message}`;
+      }
+    }
+
+    // TV Show API - Fetch TV Show Details
+    async function fetchTVDetails() {
+      const tvId = document.getElementById('tvId').value;
+      try {
+        const response = await fetch(`${baseUrl}:3003/api/tv/${tvId}`);
+        const data = await response.json();
+        document.getElementById('tvOutput').innerText = JSON.stringify(data, null, 2);
+      } catch (error) {
+        document.getElementById('tvOutput').innerText = `Error: ${error.message}`;
+      }
+    }
+
+    // TV Show API - Fetch Popular TV Shows
+    async function fetchPopularTVShows() {
+      try {
+        const response = await fetch(`${baseUrl}:3003/api/tv/popular`);
+        const data = await response.json();
+        document.getElementById('tvOutput').innerText = JSON.stringify(data, null, 2);
+      } catch (error) {
+        document.getElementById('tvOutput').innerText = `Error: ${error.message}`;
+      }
+    }
+
+    // Person API - Fetch Person Details
+    async function fetchPersonDetails() {
+      const personId = document.getElementById('personId').value;
+      try {
+        const response = await fetch(`${baseUrl}:3004/api/person/${personId}`);
+        const data = await response.json();
+        document.getElementById('personOutput').innerText = JSON.stringify(data, null, 2);
+      } catch (error) {
+        document.getElementById('personOutput').innerText = `Error: ${error.message}`;
+      }
+    }
+
+    // Helper function to get the output ID based on port
+    function getOutputId(port) {
+      switch (port) {
+        case 3001: return 'tmdbOutput';
+        case 3002: return 'movieOutput';
+        case 3003: return 'tvOutput';
+        case 3004: return 'personOutput';
+        default: return 'tmdbOutput';
+      }
+    }
+  </script>
+</body>
+</html>
