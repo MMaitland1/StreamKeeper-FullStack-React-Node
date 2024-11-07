@@ -32,23 +32,6 @@ StreamKeeper is a full-stack application designed for movie and TV show enthusia
 
 ## Key Features
 
-### Backend (Node.js API)
-
-- **Multi-Server Architecture:**  
-  The API is modularized into separate servers handling specific routes for movies, TV shows, persons, and general TMDb queries. This separation enhances modularity, maintainability, and scalability, allowing easy upgrades or modifications for individual components.
-
-- **Swagger-Documented Endpoints:**  
-  Provides a detailed and user-friendly interface for exploring and testing available routes within the API. This documentation improves developer experience and ensures a clear understanding of available operations.
-
-- **Flexible Search Functionality:**  
-  A powerful search feature enables optimized and flexible querying of movies, TV shows, and persons from the database. Search queries are handled efficiently to ensure accurate and fast results.
-
-- **Comprehensive Error Handling:**  
-  Robust error handling mechanisms ensure consistent and informative API responses, contributing to a seamless user experience and easier debugging.
-
-- **Health Check Routes:**  
-  Built-in health check endpoints offer simple and effective monitoring and validation of API status and availability.
-
 ### Frontend (React)
 
 - **Responsive Design:**  
@@ -65,6 +48,23 @@ StreamKeeper is a full-stack application designed for movie and TV show enthusia
 
 - **User-Friendly Navigation:**  
   The navigation system is designed to be intuitive, with clear links for browsing content, searching, and viewing specific details. This makes the application easy to use for all users.
+
+### Backend (Node.js API)
+
+- **Multi-Server Architecture:**  
+  The API is modularized into separate servers handling specific routes for movies, TV shows, persons, and general TMDb queries. This separation enhances modularity, maintainability, and scalability, allowing easy upgrades or modifications for individual components.
+
+- **Swagger-Documented Endpoints:**  
+  Provides a detailed and user-friendly interface for exploring and testing available routes within the API. This documentation improves developer experience and ensures a clear understanding of available operations.
+
+- **Flexible Search Functionality:**  
+  A powerful search feature enables optimized and flexible querying of movies, TV shows, and persons from the database. Search queries are handled efficiently to ensure accurate and fast results.
+
+- **Comprehensive Error Handling:**  
+  Robust error handling mechanisms ensure consistent and informative API responses, contributing to a seamless user experience and easier debugging.
+
+- **Health Check Routes:**  
+  Built-in health check endpoints offer simple and effective monitoring and validation of API status and availability.
 
 ### Microservices
 
