@@ -1,6 +1,6 @@
 # StreamKeeper - Full Stack Media Application
 
-![StreamKeeper Logo](public/Logo.png)
+![StreamKeeper Logo]([public/Logo.png](https://imgur.com/7LgzqQ8))
 
 ## Overview
 
