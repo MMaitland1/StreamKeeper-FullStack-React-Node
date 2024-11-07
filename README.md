@@ -251,60 +251,134 @@ Ensure you have the following installed on your machine:
 
    Replace `your_tmdb_api_key` with a valid TMDb API key. You can obtain one by signing up at [The Movie Database](https://www.themoviedb.org/).
 
+
+# Streamkeeper Application
+
+Streamkeeper is a multi-server backend application that provides APIs for accessing TMDb data for general, movies, TV shows, and persons.
+
+---
+
+## Prerequisites
+
+Make sure you have the following installed:
+
+- **Node.js** (version >= 12.x recommended)
+- **npm** (Node package manager)
+
+---
+
+## Installation
+
+### Method 1: Running Each Server Separately
+
+Clone the repository:
+
+```bash
+git clone <repository-url>
+```
+
+Navigate to the project directory:
+
+```bash
+cd <project-directory>
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
 ### Running the Applications
 
-1. **Start the Backend Servers:**
+The backend is divided into multiple servers, each handling specific routes. Open separate terminal windows or tabs for each server and run the following commands:
 
-   The backend is divided into multiple servers, each handling specific routes. Open separate terminal windows or tabs for each server and run the following commands:
+- **General TMDb Routes Server:**
 
-   - **General TMDb Routes Server:**
+  ```bash
+  cd streamkeeper-node-backend
+  npm run server:api
+  ```
 
-     ```bash
-     cd streamkeeper-node-backend
-     npm run server:api
-     ```
+  **Running at:** [http://localhost:3001](http://localhost:3001)
 
-     **Running at:** [http://localhost:3001](http://localhost:3001)
+- **Movies Routes Server:**
 
-   - **Movies Routes Server:**
+  ```bash
+  cd streamkeeper-node-backend
+  npm run server:movies
+  ```
 
-     ```bash
-     cd streamkeeper-node-backend
-     npm run server:movies
-     ```
+  **Running at:** [http://localhost:3002](http://localhost:3002)
 
-     **Running at:** [http://localhost:3002](http://localhost:3002)
+- **TV Shows Routes Server:**
 
-   - **TV Shows Routes Server:**
+  ```bash
+  cd streamkeeper-node-backend
+  npm run server:tv
+  ```
 
-     ```bash
-     cd streamkeeper-node-backend
-     npm run server:tv
-     ```
+  **Running at:** [http://localhost:3003](http://localhost:3003)
 
-     **Running at:** [http://localhost:3003](http://localhost:3003)
+- **Persons Routes Server:**
 
-   - **Persons Routes Server:**
+  ```bash
+  cd streamkeeper-node-backend
+  npm run server:person
+  ```
 
-     ```bash
-     cd streamkeeper-node-backend
-     npm run server:person
-     ```
+  **Running at:** [http://localhost:3004](http://localhost:3004)
 
-     **Running at:** [http://localhost:3004](http://localhost:3004)
+**Note:** Ensure that each server script (`server:api`, `server:movies`, etc.) is defined in your `package.json` under the `scripts` section.
 
-   **Note:** Ensure that each server script (`server:api`, `server:movies`, etc.) is defined in your `package.json` under the `scripts` section.
+---
 
-2. **Start the Frontend:**
+### Method 2: Single-Server Setup
 
-   ```bash
-   cd streamkeeper-react
-   npm start
-   ```
+Clone the repository:
+
+```bash
+git clone <repository-url>
+```
+
+Navigate to the project directory:
+
+```bash
+cd <project-directory>
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Set up environment variables:
+
+Create a `.env` file in the root directory and add the following:
+
+```plaintext
+TMDB_API_KEY=your_tmdb_api_key
+TMDB_BASE_URL=https://api.themoviedb.org/3
+```
+
+Replace `your_tmdb_api_key` with a valid TMDb API key.
+
+Run the application:
+
+```bash
+node <entry-file.js>  # For example, server.js
+```
+
+---
+
+**Note:** Ensure you have defined all necessary environment variables in the `.env` file for the application to function correctly.
+
+---
 
 3. **Access the Frontend:**
 
-   Open your browser and navigate to [http://localhost:3000](http://localhost:3000).
+  Open your browser and navigate to [http://localhost:3000](http://localhost:3000).
 
 ## Available Routes
 
