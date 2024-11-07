@@ -1,6 +1,6 @@
 # StreamKeeper - Full Stack Media Application
 
-![StreamKeeper Logo]([StreamKeeper-React/public/logo192.png](https://imgur.com/7LgzqQ8))
+![StreamKeeper Logo]([StreamKeeper-React/public/logo192.png](text))
 
 ## Overview
 
