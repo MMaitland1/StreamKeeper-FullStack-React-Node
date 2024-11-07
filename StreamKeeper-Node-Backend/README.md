@@ -1,9 +1,8 @@
-﻿# StreamKeeper-Node-Backend
-
+# StreamKeeper-Node-Backend
 
 ## Overview
 
-The Movie and TV Show Backend API provides a robust solution for accessing data from The Movie Database (TMDb) API. It offers endpoints for retrieving, searching, and managing information on movies, TV shows, and people, complete with detailed Swagger documentation. This API serves as an integration layer, offering clean, structured, and well-documented routes for easy access to TMDb's extensive database. 
+The Movie and TV Show Backend API provides a robust solution for accessing data from The Movie Database (TMDb) API. It offers endpoints for retrieving, searching, and managing information on movies, TV shows, and people, complete with detailed Swagger documentation. This API serves as an integration layer, offering clean, structured, and well-documented routes for easy access to TMDb's extensive database.
 
 ### Key Features
 
@@ -36,6 +35,7 @@ The Movie and TV Show Backend API provides a robust solution for accessing data 
   - [Person](#person)
   - [Review](#review)
 - [Helper Functions](#helper-functions)
+- [Microservices Architecture](#microservices-architecture)
 - [License](#license)
 
 ---
@@ -211,8 +211,47 @@ A utility function located in `tmdbHelper.js` that handles requests to the TMDb 
 
 ---
 
-## Swagger Documentation
+## Microservices Architecture
 
-The API is documented with Swagger, providing a user-friendly interface for exploring available routes and their expected inputs/outputs. Swagger documentation is auto-generated based on route definitions.
+The API employs a microservices architecture, enabling modular development, better scalability, and more maintainable codebases by isolating specific responsibilities across different services. Each microservice runs independently and communicates over HTTP, allowing for efficient handling of movies, TV shows, persons, and general TMDb queries.
+
+### Overview of Microservices
+
+- **Movie Service**:
+  - **Description**: Handles all endpoints related to movies, such as fetching popular, now-playing, top-rated, and upcoming movies. Also manages movie-specific searches, details, images, credits, and reviews.
+  - **Port**: Runs on a dedicated port for isolation.
+  - **Endpoints**: Exposes all routes under `/api/movies`.
+
+- **TV Show Service**:
+  - **Description**: Manages TV show data, including fetching popular, airing today, on-the-air, top-rated shows, and performing searches. Provides details, videos, images, credits, and more.
+  - **Port**: Operates on a separate port for modularity.
+  - **Endpoints**: Routes are exposed under `/api/tv`.
+
+- **Person Service**:
+  - **Description**: Focuses on endpoints related to persons, such as fetching popular persons, searching persons, and retrieving details, images, and credits.
+  - **Port**: Runs on its own dedicated port.
+  - **Endpoints**: Exposes all routes under `/api/person`.
+
+- **TMDb General Service**:
+  - **Description**: Handles general TMDb queries such as API validation and health check routes. This microservice serves as an integration point for general TMDb API access.
+  - **Port**: Operates independently on a dedicated port.
+  - **Endpoints**: Routes are exposed under `/api`.
+
+### Benefits of Microservices
+
+- **Modularity**: Each microservice can be independently developed, tested, deployed, and maintained.
+- **Scalability**: Services can be scaled independently based
+
+ on demand.
+- **Fault Isolation**: Issues in one microservice do not affect others, improving system resilience.
+- **Independent Deployment**: Faster deployment cycles and greater flexibility in updates and improvements.
+
+### Communication Between Microservices
+
+- **HTTP Requests**: Microservices communicate using HTTP-based calls, ensuring a lightweight and stateless interaction model.
+- **Load Balancing**: Each service can be load-balanced independently to ensure efficient resource utilization.
+
+This modular design ensures that any changes, enhancements, or bug fixes in one service do not impact the functionality of others, making it an ideal approach for a scalable and flexible Movie and TV Show API solution.
+
 
 
