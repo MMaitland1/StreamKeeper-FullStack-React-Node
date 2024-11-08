@@ -76,10 +76,12 @@ class PrefetchService {
   async performPrefetch(pagename, id) {
     switch (pagename) {
       case 'Browse':
+      case 'browse':
         await this.fetchBrowseData();
         break;
 
       case 'Home':
+      case 'home':
         await this.fetchHomeData();
         break;
 
@@ -113,7 +115,7 @@ class PrefetchService {
     await MainService.getAiringTodayTvShows();
     await MainService.getOnTheAirTvShows();
     await MainService.getTopRatedTvShows();
-    instance.prefetchPopularPersonImages();
+    this.prefetchPopularPersonImages();
   }
 
   // Fetch data for the 'Home' page

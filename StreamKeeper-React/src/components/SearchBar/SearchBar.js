@@ -55,7 +55,7 @@ function SearchBar({ currentMovie }) {
           handleKeyDown(e); // Handle Tab key press
           handleSpaceClick(e); // Handle Space key press
         }}
-        placeholder={currentMovie ? `"${currentMovie.title}"...` : 'Search for media ...'} // Dynamic placeholder text
+        placeholder={currentMovie ? `"${currentMovie.title}"...` : 'Search for media...'} // Dynamic placeholder text
       />
     </SearchBarWrapper>
   );

@@ -78,18 +78,23 @@ function Navbar() {
   const shouldShowSearchBar = location.pathname !== '/' && !location.pathname.includes('search');
   const shouldShowBrowseButton = location.pathname !== '/browse';
 
-  // New hover handler for prefetching data
+
+  const handleBrowseHover = () => {
+    PrefetchService.performPrefetch('Browse');
+  };
+
+  // Existing hover handler for other navbar elements
   const handleNavbarHover = () => {
-    PrefetchService.performPrefetch('Home'); // Example prefetch; change 'Home' to your desired page
+    PrefetchService.performPrefetch('Home'); 
   };
 
   return (
     <>
       <AppBar
         position="static"
-        sx={{ background: 'linear-gradient(120deg, black, #f20000)  ' , borderRadius: '12px'  }}
+        sx={{ background: 'linear-gradient(120deg, black, #f20000)', borderRadius: '12px' }}
       >
-        <Toolbar sx={{ borderRadius: '8px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)' }}> {/* Drop shadow for Toolbar */}
+        <Toolbar sx={{ borderRadius: '8px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)' }}>
           <img
             src={logo}
             alt="App Logo"
@@ -126,6 +131,7 @@ function Navbar() {
               color="inherit"
               component={Link}
               to="/browse"
+              onMouseEnter={handleBrowseHover} 
               sx={{
                 borderRadius: '12px',
                 '&:hover': {
