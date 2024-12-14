@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const axios = require('axios');
+const fetchFromTmdb = require('./helpers/tmdbHelper');
 
 // Import controllers
 const tmdbController = require('./controller/tmdbController');
@@ -14,27 +14,16 @@ const personController = require('./controller/personController');
 // Import Swagger setup for the movie server
 const swaggerSetup = require('./swagger');
 
-// Function to validate TMDb API key
+// Function to validate TMDb API key using the helper
 const validateApiKey = async () => {
-  const validationUrl = `${process.env.TMDB_BASE_URL}/configuration`;
-  const requestParams = { api_key: process.env.TMDB_API_KEY };
-
   try {
-    console.log('\n=== TMDb API Validation Request ===');
-    console.log('URL:', validationUrl);
-    console.log('Parameters:', JSON.stringify(requestParams, null, 2));
-
-    const response = await axios.get(validationUrl, { params: requestParams });
-    
+    const response = await fetchFromTmdb('/configuration');
     console.log('\x1b[32m%s\x1b[0m', 'TMDb API Key Validation: SUCCESS - API key is valid');
-    console.log('Response Status:', response.status);
-    console.log('Response Headers:', JSON.stringify(response.headers, null, 2));
+    console.log('Response Data:', JSON.stringify(response, null, 2));
     return true;
   } catch (error) {
     console.error('\x1b[31m%s\x1b[0m', 'TMDb API Key Validation: FAILED - API key is invalid or TMDB service is unavailable');
     console.error('\n=== Error Details ===');
-    console.error('Request URL:', validationUrl);
-    console.error('Request Parameters:', JSON.stringify(requestParams, null, 2));
     
     if (error.response) {
       // The request was made and the server responded with a status code
@@ -70,17 +59,7 @@ const startServer = (port, controller, routePath) => {
     // Endpoint to validate the TMDb API key
     app.get('/validate', async (req, res) => {
       try {
-        const validationUrl = `${process.env.TMDB_BASE_URL}/configuration`;
-        const requestParams = { api_key: process.env.TMDB_API_KEY };
-        
-        console.log('\n=== Validation Endpoint Request ===');
-        console.log('URL:', validationUrl);
-        console.log('Parameters:', JSON.stringify(requestParams, null, 2));
-
-        const response = await axios.get(validationUrl, { params: requestParams });
-        console.log('Response Status:', response.status);
-        console.log('Response Headers:', JSON.stringify(response.headers, null, 2));
-        
+        const response = await fetchFromTmdb('/configuration');
         res.status(200).send('API key is valid.');
       } catch (error) {
         console.error('\n=== Validation Endpoint Error ===');
