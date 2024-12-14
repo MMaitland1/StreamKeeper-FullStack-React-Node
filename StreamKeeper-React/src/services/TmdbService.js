@@ -1,10 +1,11 @@
 import axios from 'axios';
-
+import { BaseUrlService } from './BaseUrlService';
 class TmdbService {
   constructor() {
     // Create an Axios instance with a specified base URL for API requests
+    const baseUrlService = new BaseUrlService();
     this.api = axios.create({
-      baseURL: 'http://localhost:3001/api', // Update to your actual backend URL
+      baseURL: baseUrlService.getBaseUrl(3001),
     });
   }
 

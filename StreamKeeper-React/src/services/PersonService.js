@@ -1,10 +1,11 @@
 import axios from 'axios';
-
+import { BaseUrlService } from './BaseUrlService';
 class PersonService {
   constructor() {
     // Create an Axios instance for API requests with the base URL set
+    const baseUrlService = new BaseUrlService();
     this.api = axios.create({
-      baseURL: 'http://localhost:3004/api/person', // Update this to your actual backend URL
+      baseURL: baseUrlService.getBaseUrl(3004, 'person'),
     });
   }
 
