@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./StreamKeeper-Node-Backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+      - "3002:3002"
+      - "3003:3003"
+      - "3004:3004"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./StreamKeeper-Node-Backend/.env
+
+  frontend:
+    build:
+      context: ./StreamKeeper-React
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend

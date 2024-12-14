@@ -116,19 +116,7 @@ function SearchResultsPage() {
             </Typography>
           )}
 
-          {/* Display raw JSON data for debugging purposes */}
-          <Box sx={{ width: '100%', mt: 4, p: 2, backgroundColor: '#f4f4f4', borderRadius: 1 }}>
-            <Typography variant="h6" gutterBottom>
-              Raw JSON Data:
-            </Typography>
-            <Typography
-              variant="body2"
-              component="pre"
-              sx={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', overflowX: 'auto' }}
-            >
-              {JSON.stringify(mediaArray, null, 2)} {/* Pretty-print JSON data */}
-            </Typography>
-          </Box>
+          
         </>
       )}
     </Box>
