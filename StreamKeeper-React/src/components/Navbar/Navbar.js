@@ -1,21 +1,47 @@
+/**
+ * Navbar.js
+ * Main navigation component with health check functionality
+ * Features:
+ * - Service health monitoring
+ * - Responsive design
+ * - Dynamic search bar
+ * - Route-based content display
+ * - Alert system for service status
+ */
+
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Button, Alert, Box } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Alert, Box, useTheme, useMediaQuery } from '@mui/material';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../../images/Logo.png';
 import MainService from '../../services/MainService';
-import PrefetchService from '../../services/PrefetchService'; // Import PrefetchService
-import SearchBar from '../SearchBar/SearchBar'; // Import the SearchBar component
+import PrefetchService from '../../services/PrefetchService';
+import SearchBar from '../SearchBar/SearchBar';
 
 function Navbar() {
+  /**
+   * Hooks for routing and responsive design
+   */
   const navigate = useNavigate();
   const location = useLocation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery('(max-width:720px)');
+
+  /**
+   * Alert System State Management
+   */
   const [showAlerts, setShowAlerts] = useState(false);
   const [alertType, setAlertType] = useState('');
   const [alertCount, setAlertCount] = useState(0);
   const [errorMessages, setErrorMessages] = useState([]);
 
+  /**
+   * Service Health Check Handler
+   * Performs parallel health checks on all services
+   * Updates alert state based on responses
+   */
   const handleTitleClick = async () => {
     try {
+      // Service definitions for health checks
       const serviceNames = [
         'TMDB Service',
         'Movie Service',
@@ -24,6 +50,7 @@ function Navbar() {
         'TMDB API Key'
       ];
 
+      // Parallel health check requests
       const checks = [
         MainService.checkHealthTMDBService(),
         MainService.checkHealthMovieService(),
@@ -34,6 +61,7 @@ function Navbar() {
 
       const responses = await Promise.allSettled(checks);
 
+      // Process health check responses
       const failedResponses = responses
         .map((res, index) => {
           if (res.status === 'rejected' || !res.value) {
@@ -45,6 +73,7 @@ function Navbar() {
         })
         .filter(Boolean);
 
+      // Update alert state based on results
       if (failedResponses.length === 0) {
         setAlertType('success');
         setAlertCount(1);
@@ -63,6 +92,10 @@ function Navbar() {
     }
   };
 
+  /**
+   * Alert Auto-dismiss Timer
+   * Hides alerts after 4 seconds
+   */
   useEffect(() => {
     let timer;
     if (showAlerts) {
@@ -75,31 +108,46 @@ function Navbar() {
     };
   }, [showAlerts]);
 
-  const shouldShowSearchBar = location.pathname !== '/' && !location.pathname.includes('search');
-  const shouldShowBrowseButton = location.pathname !== '/browse';
+  /**
+   * Conditional Display Logic
+   * Determines when to show search bar and browse button based on route and screen size
+   */
+  const shouldShowSearchBar = !isMobile && location.pathname !== '/' && !location.pathname.includes('search');
+  const shouldShowBrowseButton = (location.pathname === '/' || !isMobile) && location.pathname !== '/browse';
 
-
+  /**
+   * Route Prefetching Handlers
+   * Preloads data for smoother navigation
+   */
   const handleBrowseHover = () => {
     PrefetchService.performPrefetch('Browse');
   };
 
-  // Existing hover handler for other navbar elements
   const handleNavbarHover = () => {
-    PrefetchService.performPrefetch('Home'); 
+    PrefetchService.performPrefetch('Home');
   };
 
   return (
     <>
+      {/* Main Navigation Bar */}
       <AppBar
         position="static"
         sx={{ background: 'linear-gradient(120deg, black, #f20000)', borderRadius: '12px' }}
       >
-        <Toolbar sx={{ borderRadius: '8px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)' }}>
+        <Toolbar 
+          sx={{ 
+            borderRadius: '8px', 
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            gap: 2
+          }}
+        >
+          {/* Logo with Health Check Trigger */}
           <img
             src={logo}
             alt="App Logo"
             style={{
-              marginRight: 16,
               width: 150,
               height: 'auto',
               cursor: 'pointer',
@@ -107,16 +155,31 @@ function Navbar() {
             }}
             onClick={handleTitleClick}
           />
-          <div style={{ flexGrow: 1 }}>
+          
+          {/* Desktop Search Bar Container */}
+          {!isMobile && (
+            <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
+              {shouldShowSearchBar && <SearchBar />}
+            </Box>
+          )}
+          
+          {/* Navigation Controls */}
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            gap: 2,
+            marginLeft: 'auto'
+          }}>
+            {/* Home Navigation */}
             {location.pathname !== '/' && (
               <Typography
                 variant="h6"
                 sx={{
-                  display: 'inline-block',
                   cursor: 'pointer',
                   color: 'white',
                   padding: '4px 8px',
-                  borderRadius: '12px'
+                  borderRadius: '12px',
+                  whiteSpace: 'nowrap'
                 }}
                 onMouseEnter={handleNavbarHover}
                 onClick={() => navigate('/')}
@@ -124,27 +187,31 @@ function Navbar() {
                 Stream Keeper
               </Typography>
             )}
-          </div>
-          {shouldShowSearchBar && <SearchBar />}
-          {shouldShowBrowseButton && (
-            <Button
-              color="inherit"
-              component={Link}
-              to="/browse"
-              onMouseEnter={handleBrowseHover} 
-              sx={{
-                borderRadius: '12px',
-                '&:hover': {
-                  backgroundColor: 'inherit' // No hover background color change
-                },
-                transition: 'none' // No hover animation
-              }}
-            >
-              Browse
-            </Button>
-          )}
+            
+            {/* Browse Navigation */}
+            {shouldShowBrowseButton && (
+              <Button
+                color="inherit"
+                component={Link}
+                to="/browse"
+                onMouseEnter={handleBrowseHover}
+                sx={{
+                  borderRadius: '12px',
+                  '&:hover': {
+                    backgroundColor: 'inherit'
+                  },
+                  transition: 'none',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                Browse
+              </Button>
+            )}
+          </Box>
         </Toolbar>
       </AppBar>
+
+      {/* Alert System */}
       {showAlerts && (
         <Box
           sx={{
