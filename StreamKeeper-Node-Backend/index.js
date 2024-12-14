@@ -53,8 +53,8 @@ const startServer = (port, controller, routePath) => {
 
   // Listen on HTTPS (use your SSL certificate files)
   const sslOptions = {
-    key: fs.readFileSync('./ssl/key.pem'),
-    cert: fs.readFileSync('./ssl/cert.pem')
+    key: fs.readFileSync('./ssl/private/key.key'),
+    cert: fs.readFileSync('./ssl/certs/cert.crt'),
   };
 
   https.createServer(sslOptions, app).listen(port, () => {

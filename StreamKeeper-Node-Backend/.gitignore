@@ -2,5 +2,6 @@
 
 node_modules/
 .env
-ssl/cert.pem
-ssl/key.pem
+ssl/certs/cert.crt
+ssl/certs/cert-chain.crt
+ssl/private/key.key
