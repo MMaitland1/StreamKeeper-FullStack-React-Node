@@ -1,54 +1,102 @@
+/**
+ * DisplayCardCarousel.js
+ * A responsive, customizable carousel component for displaying media cards
+ * Features include:
+ * - Dynamic card sizing and spacing
+ * - Mobile responsiveness
+ * - Smooth scrolling navigation
+ * - Support for multiple card types
+ * - Custom width and height configurations
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography, useMediaQuery } from '@mui/material';
 import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
 import DisplayCardA from '../DisplayCardA/DisplayCardA';
 import DisplayCardB from '../DisplayCardB/DisplayCardB';
 
+/**
+ * DisplayCardCarousel Component
+ * @param {Object[]} items - Array of media items or React elements to display
+ * @param {number} initialCarouselWidth - Starting width of carousel (default: 800)
+ * @param {number} carouselHeight - Height of carousel (default: 400)
+ * @param {number} displayLimit - Maximum number of cards to show (default: 4)
+ * @param {boolean} showArrows - Whether to show navigation arrows (default: true)
+ * @param {('A'|'B')} cardType - Type of display card to use
+ */
 function DisplayCardCarousel({
   items,
   initialCarouselWidth = 800,
   carouselHeight = 400,
   displayLimit = 4,
   showArrows = true,
-  cardType = 'A', // Prop to toggle between DisplayCardA and DisplayCardB
+  cardType = 'A',
 }) {
-  const scrollContainerRef = useRef(null); // Ref to track the scrollable container
-  const [carouselWidth, setCarouselWidth] = useState(initialCarouselWidth); // State for carousel width
+  // Refs and State
+  const scrollContainerRef = useRef(null);
+  const [carouselWidth, setCarouselWidth] = useState(initialCarouselWidth);
+  
+  // Responsive layout detection
+  const isMobile = useMediaQuery('(max-width:720px)');
 
-  // Determine card dimensions based on items array
+  /**
+   * Card Dimension Calculations
+   * Determines card sizes based on device type and available space
+   */
   const sampleCard = items[0] instanceof Object ? items[0] : {};
-  const cardWidth = sampleCard.fixedWidth || sampleCard.minWidth || 275;
-  const cardHeight = sampleCard.fixedHeight || sampleCard.minHeight || carouselHeight; // Fallback to carousel height
-  const gap = 20; // Gap between cards
+  const defaultCardWidth = 275;
+  const mobileCardWidth = Math.min(window.innerWidth - 40, defaultCardWidth);
+  const cardWidth = isMobile ? mobileCardWidth : (sampleCard.fixedWidth || sampleCard.minWidth || defaultCardWidth);
+  const cardHeight = sampleCard.fixedHeight || sampleCard.minHeight || carouselHeight;
+  const gap = isMobile ? 10 : 20;
+  const arrowSpace = 120; // Space for navigation arrows
 
-  const scrollAmount = cardWidth + gap; // Amount to scroll per click
-  const maxCards = Math.floor(carouselWidth / scrollAmount); // Max cards that can be displayed based on carousel width
-  const cardsDisplayed = Math.min(displayLimit, maxCards); // Number of cards to display, constrained by displayLimit
+  /**
+   * Carousel Configuration
+   * Calculates scroll behavior and card display limits
+   */
+  const scrollAmount = cardWidth + gap;
+  const maxCards = isMobile ? 1 : Math.floor((window.innerWidth - arrowSpace) / (cardWidth + gap));
+  const cardsDisplayed = isMobile ? 1 : Math.min(displayLimit, maxCards);
 
-  // Update carousel width on window resize
+  /**
+   * Window Resize Handler
+   * Adjusts carousel width based on viewport changes
+   */
   useEffect(() => {
-    const handleResize = () => setCarouselWidth(window.innerWidth * 0.8);
+    const handleResize = () => {
+      const newWidth = isMobile 
+        ? window.innerWidth - 40  // Mobile width with padding
+        : window.innerWidth * 0.8; // Desktop width at 80% of viewport
+      setCarouselWidth(newWidth);
+    };
+    
     window.addEventListener('resize', handleResize);
     handleResize();
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [isMobile]);
 
-  // Scroll to the previous set of cards
+  /**
+   * Navigation Handlers
+   * Manages smooth scrolling between cards
+   */
   const handlePrev = () => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     }
   };
 
-  // Scroll to the next set of cards
   const handleNext = () => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
-  // Handle case where initialCarouselWidth is smaller than the scroll amount
+  /**
+   * Dimension Validation
+   * Displays error message if carousel dimensions are invalid
+   */
   if (initialCarouselWidth < scrollAmount) {
     return (
       <Box
@@ -82,16 +130,22 @@ function DisplayCardCarousel({
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
+        margin: '0 auto',
+        maxWidth: isMobile ? '100%' : 'none',
+        padding: isMobile ? '0' : 0,
       }}
     >
+      {/* Carousel Container */}
       <Box
         sx={{
-          width: cardWidth * cardsDisplayed + gap * (cardsDisplayed - 1), // Calculate container width based on cards displayed
-          height: cardHeight + 100, // Extra height for padding and controls
+          width: isMobile ? '100%' : cardWidth * cardsDisplayed + gap * (cardsDisplayed - 1),
+          height: cardHeight + 100,
           position: 'relative',
+          margin: '0 auto',
         }}
       >
-        {showArrows && (
+        {/* Previous Button */}
+        {showArrows && !isMobile && (
           <IconButton
             onClick={handlePrev}
             sx={{
@@ -108,26 +162,28 @@ function DisplayCardCarousel({
               '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.7)' },
             }}
           >
-            <ArrowBackIos fontSize="small" />
+            <ArrowBackIos fontSize="medium" />
           </IconButton>
         )}
 
+        {/* Scrollable Card Container */}
         <Box
           ref={scrollContainerRef}
           sx={{
-            transform: 'translateY(-12%)', // Center cards vertically within the container
+            transform: isMobile ? 'none' : 'translateY(-12%)',
             alignItems: 'center',
             display: 'flex',
-            gap: `${gap}px`, // Set gap between cards
-            overflowX: 'scroll', // Enable horizontal scrolling
-            scrollSnapType: 'x mandatory', // Snap scrolling for better user experience
+            gap: `${gap}px`,
+            overflowX: 'scroll',
+            scrollSnapType: 'x mandatory',
             width: '100%',
             height: '100%',
-            padding: '10px 0',
-            scrollbarWidth: 'none', // Hide default scrollbar
-            '&::-webkit-scrollbar': { display: 'none' }, // Hide scrollbar for Webkit browsers
+            padding: isMobile ? '0' : '10px 0',
+            scrollbarWidth: 'none',
+            '&::-webkit-scrollbar': { display: 'none' },
           }}
         >
+          {/* Card Rendering */}
           {items.map((item, idx) => (
             <Box
               key={idx}
@@ -135,24 +191,26 @@ function DisplayCardCarousel({
                 minWidth: cardWidth,
                 maxWidth: cardWidth,
                 height: cardHeight,
-                scrollSnapAlign: 'start', // Snap each card into place
+                scrollSnapAlign: 'start',
                 alignItems: 'center',
+                margin: isMobile ? '0 auto' : '0',
               }}
             >
               {React.isValidElement(item) ? (
-                item // Render React elements directly
+                item
               ) : (
                 cardType === 'A' ? (
-                  <DisplayCardA media={item} fixedWidth={cardWidth} fixedHeight={cardHeight} /> // Render DisplayCardA
+                  <DisplayCardA media={item} fixedWidth={cardWidth} fixedHeight={cardHeight} />
                 ) : (
-                  <DisplayCardB media={item} fixedWidth={cardWidth} fixedHeight={cardHeight} /> // Render DisplayCardB
+                  <DisplayCardB media={item} fixedWidth={cardWidth} fixedHeight={cardHeight} />
                 )
               )}
             </Box>
           ))}
         </Box>
 
-        {showArrows && (
+        {/* Next Button */}
+        {showArrows && !isMobile && (
           <IconButton
             onClick={handleNext}
             sx={{
@@ -169,7 +227,7 @@ function DisplayCardCarousel({
               '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.7)' },
             }}
           >
-            <ArrowForwardIos fontSize="small" />
+            <ArrowForwardIos fontSize="medium" />
           </IconButton>
         )}
       </Box>
@@ -177,6 +235,10 @@ function DisplayCardCarousel({
   );
 }
 
+/**
+ * PropTypes Definition
+ * Defines expected props and their types for component validation
+ */
 DisplayCardCarousel.propTypes = {
   items: PropTypes.arrayOf(
     PropTypes.oneOfType([
@@ -189,14 +251,14 @@ DisplayCardCarousel.propTypes = {
         backdropUrl: PropTypes.string,
         id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       }),
-      PropTypes.element, // Accept React elements in the items array
+      PropTypes.element,
     ])
   ).isRequired,
   initialCarouselWidth: PropTypes.number,
   carouselHeight: PropTypes.number,
   displayLimit: PropTypes.number,
   showArrows: PropTypes.bool,
-  cardType: PropTypes.oneOf(['A', 'B']), // Toggle between DisplayCardA and DisplayCardB
+  cardType: PropTypes.oneOf(['A', 'B']),
 };
 
 export default DisplayCardCarousel;
