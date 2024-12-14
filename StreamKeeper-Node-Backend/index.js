@@ -3,6 +3,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const https = require('https');  // Require the 'https' module
+const fs = require('fs');        // For reading SSL certificates
 const fetchFromTmdb = require('./helpers/tmdbHelper');
 
 // Import controllers
@@ -13,6 +15,7 @@ const personController = require('./controller/personController');
 
 const swaggerSetup = require('./swagger');
 
+// Validate API key by making a request to TMDb
 const validateApiKey = async () => {
   try {
     await fetchFromTmdb('/configuration');
@@ -22,12 +25,14 @@ const validateApiKey = async () => {
   }
 };
 
+// Set up HTTP server with SSL (HTTPS)
 const startServer = (port, controller, routePath) => {
   const app = express();
 
   app.use(express.json());
   app.use(cors());
 
+  // Serve the frontend static files for port 3001
   if (port === 3001) {
     app.use(express.static(path.join(__dirname, 'view')));
     
@@ -41,12 +46,19 @@ const startServer = (port, controller, routePath) => {
     });
   }
 
+  // Set up routes for all APIs
   app.use(routePath, controller);
 
   swaggerSetup(app);
 
-  app.listen(port, () => {
-    console.log(`Server for ${routePath} running at http://localhost:${port}`);
+  // Listen on HTTPS (use your SSL certificate files)
+  const sslOptions = {
+    key: fs.readFileSync('./ssl/key.pem'),
+    cert: fs.readFileSync('./ssl/cert.pem')
+  };
+
+  https.createServer(sslOptions, app).listen(port, () => {
+    console.log(`Server for ${routePath} running at https://localhost:${port}`);
   });
 };
 
@@ -54,6 +66,7 @@ const initialize = async () => {
   const isValid = await validateApiKey();
   
   if (isValid) {
+    // Start the backend services
     startServer(3001, tmdbController, '/api');
     startServer(3002, movieController, '/api/movies');
     startServer(3003, tvShowController, '/api/tv');
