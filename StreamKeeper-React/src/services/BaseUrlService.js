@@ -5,9 +5,9 @@ export class BaseUrlService {
     const baseIP = PUBLIC_IP.trim() || 'localhost';
     
     if (!endpoint) {
-      return `http://${baseIP}:${port}/api`;
+      return `https://${baseIP}:${port}/api`;
     }
     
-    return `http://${baseIP}:${port}/api/${endpoint}`;
+    return `https://${baseIP}:${port}/api/${endpoint}`;
   }
 }
