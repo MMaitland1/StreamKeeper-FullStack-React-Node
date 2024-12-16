@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   setup:
     build:
@@ -8,6 +6,9 @@ services:
     volumes:
       - ./StreamKeeper-Node-Backend:/app/StreamKeeper-Node-Backend
       - ./StreamKeeper-React:/app/StreamKeeper-React
+    command: node setup.js
+    profiles:
+      - setup
 
   backend:
     build:
@@ -20,11 +21,10 @@ services:
       - "3004:3004"
     environment:
       - NODE_ENV=development
+    profiles:
+      - main
     env_file:
       - ./StreamKeeper-Node-Backend/.env
-    depends_on:
-      setup:
-        condition: service_completed_successfully
 
   frontend:
     build:
@@ -34,5 +34,7 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
+    profiles:
+      - main
     depends_on:
       - backend

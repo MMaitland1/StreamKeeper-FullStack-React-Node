@@ -1,5 +1,8 @@
 const fs = require('fs').promises;
 const path = require('path');
+//Run Commands:
+//docker-compose --profile setup up --build
+//docker-compose --profile main up --build
 
 // ============= CONFIGURATION VARIABLES =============
 // Fill these values before running the script
@@ -8,7 +11,7 @@ const CONFIG = {
     PUBLIC_IP: '',  // Leave empty for development/localhost
 
     // Backend .env variables
-    TMDB_BASE_URL: '',
+    TMDB_BASE_URL: 'https://api.themoviedb.org/3',
     TMDB_API_KEY: ''
 };
 // ================================================
@@ -23,10 +26,22 @@ const FILES = {
             }
         ]
     },
-    envFile: {
+    backendEnvFile: {
         path: './StreamKeeper-Node-Backend/.env',
         content: () => `TMDB_BASE_URL=${CONFIG.TMDB_BASE_URL}
 TMDB_API_KEY=${CONFIG.TMDB_API_KEY}`
+    },
+    frontendEnvFile: {
+        path: './StreamKeeper-React/.env',
+        content: () => `# Enable HTTPS
+HTTPS=false
+
+# Port (optional, default is 3000)
+PORT=3000
+
+# If you have custom SSL certificate (optional)
+SSL_CRT_FILE=ssl/certs/cert.crt
+SSL_KEY_FILE=ssl/private/key.key`
     }
 };
 
@@ -67,25 +82,37 @@ async function createEnvFile(fileConfig) {
 async function setup() {
     console.log('Checking setup requirements...');
 
-    // If all config values are empty and .env exists, assume setup is complete
-    const envExists = await checkFileExists(FILES.envFile.path);
+    const backendEnvExists = await checkFileExists(FILES.backendEnvFile.path);
+    const frontendEnvExists = await checkFileExists(FILES.frontendEnvFile.path);
     const allConfigEmpty = Object.values(CONFIG).every(value => value === '');
     
-    if (allConfigEmpty && envExists) {
-        console.log('No new configuration values provided and .env exists. Setup skipped.');
+    // Check if no backend .env and no config values
+    if (!backendEnvExists && allConfigEmpty) {
+        console.error('Error: No backend .env file exists and no configuration values provided.');
+        console.error('Please either:');
+        console.error('1. Fill in the CONFIG values in setup.js');
+        console.error('2. Provide an existing .env file');
+        process.exit(1);
+    }
+
+    if (allConfigEmpty && backendEnvExists) {
+        console.log('No new configuration values provided and backend .env exists. Setup skipped.');
         return;
     }
 
     console.log('Starting project setup...');
 
-    // Only update BaseUrlService.js if PUBLIC_IP is provided
     if (CONFIG.PUBLIC_IP) {
         await modifyFile(FILES.baseUrlService);
     }
 
-    // Only create .env if it doesn't exist or if TMDB values are provided
-    if (!envExists || CONFIG.TMDB_BASE_URL || CONFIG.TMDB_API_KEY) {
-        await createEnvFile(FILES.envFile);
+    if (!backendEnvExists || CONFIG.TMDB_BASE_URL || CONFIG.TMDB_API_KEY) {
+        await createEnvFile(FILES.backendEnvFile);
+    }
+
+    // Always create frontend .env if it doesn't exist
+    if (!frontendEnvExists) {
+        await createEnvFile(FILES.frontendEnvFile);
     }
 
     console.log('Setup completed!');
@@ -93,7 +120,7 @@ async function setup() {
 
 // Validate configuration before running
 function validateConfig() {
-    // If all values are empty and .env exists, skip validation
+    // Skip validation if all values are empty (handled in setup function)
     if (Object.values(CONFIG).every(value => value === '')) {
         return;
     }
