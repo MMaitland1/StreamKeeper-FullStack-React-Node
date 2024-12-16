@@ -23,7 +23,6 @@ function Navbar() {
    */
   const navigate = useNavigate();
   const location = useLocation();
-  const theme = useTheme();
   const isMobile = useMediaQuery('(max-width:720px)');
 
   /**

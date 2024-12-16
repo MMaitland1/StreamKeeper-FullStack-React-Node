@@ -87,9 +87,9 @@ function InfoDisplayPage() {
               >
                 <DisplayCardB
                   media={media}
-                  minWidth={isMobile ? 'auto' : 275}
-                  maxWidth={isMobile ? '100%' : 400}
-                  minHeight={isMobile ? 'auto' : 500}
+                  minWidth={275}
+                  maxWidth={ 400}
+                  minHeight={500}
                   sx={{
                     width: isMobile ? '100%' : 'auto',
                     margin: '0 auto',

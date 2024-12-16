@@ -1,7 +1,6 @@
 // SearchBar.js
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { TextField } from '@mui/material';
 import { SearchBarWrapper, StyledTextField } from './SearchBar.styled';
 import { useNavigate } from 'react-router-dom';
 import { processSearchTerm } from '../SearchValidation/SearchValidation';
