@@ -1,10 +1,3 @@
-/**
- * HomePage.js
- * Main landing page component for Steam Keeper application
- * Displays featured content, movies, and TV shows in various categories
- * Includes search functionality and responsive carousel displays
- */
-
 import React, { useEffect, useState } from 'react';
 import { Container, CircularProgress, Box, Typography, Tabs, Tab } from '@mui/material';
 import MainService from '../services/MainService';
@@ -16,13 +9,6 @@ import SearchBar from '../components/SearchBar/SearchBar';
 import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
-  /**
-   * State Management
-   * Separate states for different categories of movies and TV shows
-   * Loading state for initial data fetch
-   * Current movie state for featured content
-   * Tab states for both movie and TV sections
-   */
   const [popularMovies, setPopularMovies] = useState([]);
   const [topRatedMovies, setTopRatedMovies] = useState([]);
   const [upcomingMovies, setUpcomingMovies] = useState([]);
@@ -36,22 +22,15 @@ const HomePage = () => {
 
   const navigate = useNavigate();
 
-  /**
-   * Initial Data Fetching
-   * Loads popular movies and TV shows on component mount
-   * Sets up featured content for the hero section
-   */
   useEffect(() => {
     const fetchInitialData = async () => {
       setLoading(true);
       try {
-        // Fetch and instantiate popular movies
         const moviesData = await MainService.getPopularMovies();
         const movieInstances = (moviesData || []).map((movieData) => new Movie(movieData));
         setPopularMovies(movieInstances);
         setCurrentMovie(movieInstances[0] || null);
 
-        // Fetch and instantiate popular TV shows
         const tvData = await MainService.getPopularTvShows();
         const tVShowInstances = (tvData || []).map((tvShowData) => new TVShow(tvShowData));
         setPopularTVShows(tVShowInstances);
@@ -65,12 +44,6 @@ const HomePage = () => {
     fetchInitialData();
   }, []);
 
-  /**
-   * Lazy Loading Movies Data
-   * Fetches additional movie categories on demand
-   * Prevents unnecessary API calls by checking if data already exists
-   * @param {number} tabIndex - Index of the selected movie tab
-   */
   const fetchMoviesData = async (tabIndex) => {
     try {
       if (tabIndex === 1 && topRatedMovies.length === 0) {
@@ -87,12 +60,6 @@ const HomePage = () => {
     }
   };
 
-  /**
-   * Lazy Loading TV Shows Data
-   * Fetches additional TV show categories on demand
-   * Prevents unnecessary API calls by checking if data already exists
-   * @param {number} tabIndex - Index of the selected TV show tab
-   */
   const fetchTvData = async (tabIndex) => {
     try {
       if (tabIndex === 1 && topRatedTVShows.length === 0) {
@@ -101,7 +68,7 @@ const HomePage = () => {
         setTopRatedTVShows(tVShowInstances);
       } else if (tabIndex === 2 && onAirTVShows.length === 0) {
         const data = await MainService.getOnTheAirTvShows();
-        const tVShowInstances = (data || [].map((tvShowData) => new TVShow(tvShowData)));
+        const tVShowInstances = (data || []).map((tvShowData) => new TVShow(tvShowData));
         setOnAirTVShows(tVShowInstances);
       }
     } catch (error) {
@@ -109,10 +76,6 @@ const HomePage = () => {
     }
   };
 
-  /**
-   * Tab Change Handlers
-   * Update active tab states and trigger data fetching
-   */
   const handleMovieTabChange = (event, newValue) => {
     setMovieTab(newValue);
   };
@@ -121,40 +84,19 @@ const HomePage = () => {
     setTvTab(newValue);
   };
 
-  /**
-   * Search Handler
-   * Placeholder for search functionality
-   * @param {string} query - Search query string
-   */
   const handleSearch = (query) => {
     console.log('Search triggered with query:', query);
   };
 
-  /**
-   * Navigation Handler
-   * Manages routing to detailed info pages
-   * @param {string} topic - Category name
-   * @param {Array} mediaArray - Media items to display
-   * @param {string} fetchFunction - Function name for loading more data
-   */
   const handleNavigate = (topic, mediaArray, fetchFunction) => {
     navigate(`/info/${topic}`, { state: { mediaArray, fetchFunction } });
   };
 
-  /**
-   * Dynamic Content Selectors
-   * Determine which content to display based on active tabs
-   */
   const movieCarouselItems =
     movieTab === 0 ? popularMovies : movieTab === 1 ? topRatedMovies : upcomingMovies;
   const tVShowCarouselItems =
     tvTab === 0 ? popularTVShows : tvTab === 1 ? topRatedTVShows : onAirTVShows;
 
-  /**
-   * Double-Click Handlers for Tabs
-   * Enable quick navigation to detailed views
-   * @param {number} tabIndex - Index of the clicked tab
-   */
   const handleMovieTabDoubleClick = (tabIndex) => {
     const topic =
       tabIndex === 0
@@ -189,21 +131,27 @@ const HomePage = () => {
 
   return (
     <Container>
-      {/* Header Section */}
       <Box display="flex" alignItems="center" justifyContent="space-between">
-        <Typography variant="h3" align="left" gutterBottom>
-          Welcome to Steam Keeper
+        <Typography 
+          variant="h3" 
+          align="left" 
+          gutterBottom
+          sx={{
+            '@media (max-width: 400px)': {
+              fontSize: 'h5.fontSize'
+            }
+          }}
+        >
+          Welcome to Stream Keeper
         </Typography>
       </Box>
 
-      {/* Loading State Display */}
       {loading ? (
         <Box display="flex" justifyContent="center" alignItems="center" mt={4}>
           <CircularProgress />
         </Box>
       ) : (
         <Box mt={4}>
-          {/* Hero Section with Feature Carousel and Search */}
           <Box sx={{ position: 'relative', width: '100%', height: '70vh', mb: 6 }}>
             <MediaDisplayCarousel
               mediaItems={popularMovies || []}
@@ -211,7 +159,6 @@ const HomePage = () => {
               interval={5000}
               onItemChange={(item) => setCurrentMovie(item)}
             />
-            {/* Overlay Search Bar */}
             <Box
               sx={{
                 position: 'absolute',
@@ -228,11 +175,17 @@ const HomePage = () => {
             </Box>
           </Box>
 
-          {/* Movies Section */}
-          <Typography variant="h4" gutterBottom>
+          <Typography 
+            variant="h4" 
+            gutterBottom 
+            sx={{
+              '@media (max-width: 720px)': {
+                textAlign: 'center'
+              }
+            }}
+          >
             Movies
           </Typography>
-          {/* Clickable Section Title */}
           <Typography
             variant="h5"
             align="left"
@@ -252,7 +205,13 @@ const HomePage = () => {
                   : 'getUpcomingMovies'
               )
             }
-            sx={{ cursor: 'pointer', color: 'inherit' }}
+            sx={{ 
+              cursor: 'pointer', 
+              color: 'inherit',
+              '@media (max-width: 720px)': {
+                textAlign: 'center'
+              }
+            }}
           >
             {movieTab === 0
               ? 'Popular Movies'
@@ -260,14 +219,24 @@ const HomePage = () => {
               ? 'Top Rated Movies'
               : 'Upcoming Movies'}
           </Typography>
-          {/* Movie Category Tabs */}
-          <Box display="flex" justifyContent="flex-start" alignItems="center" mb={2}>
+          <Box 
+            display="flex" 
+            justifyContent="flex-start" 
+            alignItems="center" 
+            mb={2}
+            sx={{
+              '@media (max-width: 720px)': {
+                justifyContent: 'center'
+              }
+            }}
+          >
             <Tabs
               value={movieTab}
               onChange={handleMovieTabChange}
               textColor="inherit"
               indicatorColor="primary"
               sx={{
+                zIndex: 10,
                 '& .MuiTab-root': {
                   color: 'red',
                   fontSize: {
@@ -310,8 +279,11 @@ const HomePage = () => {
               />
             </Tabs>
           </Box>
-          {/* Movie Carousel Display */}
-          <Box mt={4}>
+          <Box sx={{ 
+            '@media (max-width: 720px)': {
+              transform: 'translateY(-45px)'
+            }
+          }}>
             <DisplayCardCarousel
               items={movieCarouselItems || []}
               initialCarouselWidth={1200}
@@ -320,11 +292,17 @@ const HomePage = () => {
             />
           </Box>
 
-          {/* TV Shows Section */}
-          <Typography variant="h4" gutterBottom>
+          <Typography 
+            variant="h4" 
+            gutterBottom 
+            sx={{
+              '@media (max-width: 720px)': {
+                textAlign: 'center'
+              }
+            }}
+          >
             TV Shows
           </Typography>
-          {/* Clickable Section Title */}
           <Typography
             variant="h5"
             align="left"
@@ -344,7 +322,13 @@ const HomePage = () => {
                   : 'getOnTheAirTvShows'
               )
             }
-            sx={{ cursor: 'pointer', color: 'inherit' }}
+            sx={{ 
+              cursor: 'pointer', 
+              color: 'inherit',
+              '@media (max-width: 720px)': {
+                textAlign: 'center'
+              }
+            }}
           >
             {tvTab === 0
               ? 'Popular TV Shows'
@@ -352,14 +336,24 @@ const HomePage = () => {
               ? 'Top Rated TV Shows'
               : 'On The Air TV Shows'}
           </Typography>
-          {/* TV Show Category Tabs */}
-          <Box display="flex" justifyContent="flex-start" alignItems="center" mb={2}>
+          <Box 
+            display="flex" 
+            justifyContent="flex-start" 
+            alignItems="center" 
+            mb={2}
+            sx={{
+              '@media (max-width: 720px)': {
+                justifyContent: 'center'
+              }
+            }}
+          >
             <Tabs
               value={tvTab}
               onChange={handleTvTabChange}
               textColor="inherit"
               indicatorColor="primary"
               sx={{
+                zIndex: 10,
                 '& .MuiTab-root': {
                   color: 'red',
                   fontSize: {
@@ -402,8 +396,11 @@ const HomePage = () => {
               />
             </Tabs>
           </Box>
-          {/* TV Show Carousel Display */}
-          <Box mt={4}>
+          <Box sx={{ 
+            '@media (max-width: 720px)': {
+              transform: 'translateY(-45px)'
+            }
+          }}>
             <DisplayCardCarousel
               items={tVShowCarouselItems || []}
               initialCarouselWidth={1200}

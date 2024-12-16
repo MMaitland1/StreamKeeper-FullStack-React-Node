@@ -67,6 +67,7 @@ function DisplayCardA({
   const handleMouseEnter = () => {
     if (['Movie', 'TvShow', 'Person'].includes(media.mediaType)) {
       prefetchService.executePrefetch(media.mediaType, media.mediaType, media.id);
+
     }
   };
 

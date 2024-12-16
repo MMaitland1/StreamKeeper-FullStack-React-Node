@@ -3,8 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const https = require('https');  // Require the 'https' module
-const fs = require('fs');        // For reading SSL certificates
+const http = require('http');  // Changed from https to http
 const fetchFromTmdb = require('./helpers/tmdbHelper');
 
 // Import controllers
@@ -25,7 +24,7 @@ const validateApiKey = async () => {
   }
 };
 
-// Set up HTTP server with SSL (HTTPS)
+// Set up HTTP server (no SSL needed locally)
 const startServer = (port, controller, routePath) => {
   const app = express();
 
@@ -51,14 +50,11 @@ const startServer = (port, controller, routePath) => {
 
   swaggerSetup(app);
 
-  // Listen on HTTPS (use your SSL certificate files)
-  const sslOptions = {
-    key: fs.readFileSync('./ssl/private/key.key'),
-    cert: fs.readFileSync('./ssl/certs/cert.crt'),
-  };
-
-  https.createServer(sslOptions, app).listen(port, () => {
-    console.log(`Server for ${routePath} running at https://localhost:${port}`);
+  // Create regular HTTP server
+  const server = http.createServer(app);
+  
+  server.listen(port, () => {
+    console.log(`Server for ${routePath} running at http://localhost:${port}`);
   });
 };
 
@@ -71,7 +67,9 @@ const initialize = async () => {
     startServer(3002, movieController, '/api/movies');
     startServer(3003, tvShowController, '/api/tv');
     startServer(3004, personController, '/api/person');
+    console.log('All services started successfully');
   } else {
+    console.error('Failed to validate API key');
     process.exit(1);
   }
 };

@@ -167,13 +167,14 @@ const BrowsePage = () => {
         }}>
             {/* Page Title */}
             <h1 style={{ 
-                textAlign: 'center', 
-                fontSize: textSizes.browse,
-                marginBottom: '40px',
-                fontWeight: 'bold'
-            }}>
-                Browse
-            </h1>
+    textAlign: 'center', 
+    fontSize: textSizes.browse,
+    marginBottom: '40px',
+    fontWeight: 'bold',
+    textShadow: viewportWidth <= 720 ? '2px 2px 4px rgba(0,0,0,0.9)' : 'none'
+}}>
+    Browse
+</h1>
 
             {/* Movies Section */}
             <div style={{ marginBottom: '40px' }}>
@@ -181,7 +182,7 @@ const BrowsePage = () => {
                     fontSize: textSizes.section,
                     marginBottom: '30px',
                     textAlign: viewportWidth <= 720 ? 'center' : 'left',
-                    fontWeight: viewportWidth <= 720 ? 'bold' : 'normal',
+                    fontWeight: 'normal',
                     letterSpacing: viewportWidth <= 720 ? '0.5px' : 'normal'
                 }}>
                     Movies
@@ -225,7 +226,7 @@ const BrowsePage = () => {
                     fontSize: textSizes.section,
                     marginBottom: '30px',
                     textAlign: viewportWidth <= 720 ? 'center' : 'left',
-                    fontWeight: viewportWidth <= 720 ? 'bold' : 'normal',
+                    fontWeight:  'normal',
                     letterSpacing: viewportWidth <= 720 ? '0.5px' : 'normal'
                 }}>
                     TV Shows
@@ -269,7 +270,7 @@ const BrowsePage = () => {
                     fontSize: textSizes.section,
                     marginBottom: '30px',
                     textAlign: viewportWidth <= 720 ? 'center' : 'left',
-                    fontWeight: viewportWidth <= 720 ? 'bold' : 'normal',
+                    fontWeight: 'normal',
                     letterSpacing: viewportWidth <= 720 ? '0.5px' : 'normal'
                 }}>
                     Popular People
