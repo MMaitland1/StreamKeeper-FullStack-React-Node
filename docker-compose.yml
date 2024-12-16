@@ -1,6 +1,14 @@
 version: '3.8'
 
 services:
+  setup:
+    build:
+      context: .
+      dockerfile: dockerfile
+    volumes:
+      - ./StreamKeeper-Node-Backend:/app/StreamKeeper-Node-Backend
+      - ./StreamKeeper-React:/app/StreamKeeper-React
+
   backend:
     build:
       context: ./StreamKeeper-Node-Backend
@@ -14,6 +22,9 @@ services:
       - NODE_ENV=development
     env_file:
       - ./StreamKeeper-Node-Backend/.env
+    depends_on:
+      setup:
+        condition: service_completed_successfully
 
   frontend:
     build:

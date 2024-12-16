@@ -30,6 +30,15 @@ TMDB_API_KEY=${CONFIG.TMDB_API_KEY}`
     }
 };
 
+async function checkFileExists(path) {
+    try {
+        await fs.access(path);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 async function modifyFile(fileConfig) {
     try {
         const content = await fs.readFile(fileConfig.path, 'utf8');
@@ -56,19 +65,39 @@ async function createEnvFile(fileConfig) {
 }
 
 async function setup() {
+    console.log('Checking setup requirements...');
+
+    // If all config values are empty and .env exists, assume setup is complete
+    const envExists = await checkFileExists(FILES.envFile.path);
+    const allConfigEmpty = Object.values(CONFIG).every(value => value === '');
+    
+    if (allConfigEmpty && envExists) {
+        console.log('No new configuration values provided and .env exists. Setup skipped.');
+        return;
+    }
+
     console.log('Starting project setup...');
 
-    // Update BaseUrlService.js
-    await modifyFile(FILES.baseUrlService);
+    // Only update BaseUrlService.js if PUBLIC_IP is provided
+    if (CONFIG.PUBLIC_IP) {
+        await modifyFile(FILES.baseUrlService);
+    }
 
-    // Create .env file
-    await createEnvFile(FILES.envFile);
+    // Only create .env if it doesn't exist or if TMDB values are provided
+    if (!envExists || CONFIG.TMDB_BASE_URL || CONFIG.TMDB_API_KEY) {
+        await createEnvFile(FILES.envFile);
+    }
 
     console.log('Setup completed!');
 }
 
 // Validate configuration before running
 function validateConfig() {
+    // If all values are empty and .env exists, skip validation
+    if (Object.values(CONFIG).every(value => value === '')) {
+        return;
+    }
+
     const missingValues = Object.entries(CONFIG)
         .filter(([key, value]) => value === '' && key !== 'PUBLIC_IP')
         .map(([key]) => key);
