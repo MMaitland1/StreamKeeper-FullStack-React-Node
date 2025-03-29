@@ -29,7 +29,7 @@ services:
       - "3004:3004"
     environment:
       - NODE_ENV=development
-    profiles: ["main", "backend"]  # Added individual profile
+    profiles: ["main", "backend"]  
     env_file:
       - ./StreamKeeper-Node-Backend/.env
 
@@ -41,6 +41,6 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-    profiles: ["main", "frontend"]  # Added individual profile
+    profiles: ["main", "frontend"]  
     depends_on:
       - backend
