@@ -1,3 +1,12 @@
+#docker-compose --profile setup up --build
+#docker-compose --profile main up --build
+
+# Backend only
+#docker-compose up -d backend
+
+# Frontend only
+#docker-compose up -d frontend
+
 services:
   setup:
     build:
@@ -7,8 +16,7 @@ services:
       - ./StreamKeeper-Node-Backend:/app/StreamKeeper-Node-Backend
       - ./StreamKeeper-React:/app/StreamKeeper-React
     command: node setup.js
-    profiles:
-      - setup
+    profiles: ["setup"]
 
   backend:
     build:
@@ -21,8 +29,7 @@ services:
       - "3004:3004"
     environment:
       - NODE_ENV=development
-    profiles:
-      - main
+    profiles: ["main", "backend"]  # Added individual profile
     env_file:
       - ./StreamKeeper-Node-Backend/.env
 
@@ -34,7 +41,6 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-    profiles:
-      - main
+    profiles: ["main", "frontend"]  # Added individual profile
     depends_on:
       - backend

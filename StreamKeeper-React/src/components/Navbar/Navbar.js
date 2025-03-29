@@ -10,7 +10,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Button, Alert, Box, useTheme, useMediaQuery } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Alert, Box, useMediaQuery } from '@mui/material';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../../images/Logo.png';
 import MainService from '../../services/MainService';
@@ -40,7 +40,6 @@ function Navbar() {
    */
   const handleTitleClick = async () => {
     try {
-      // Service definitions for health checks
       const serviceNames = [
         'TMDB Service',
         'Movie Service',
@@ -49,7 +48,6 @@ function Navbar() {
         'TMDB API Key'
       ];
 
-      // Parallel health check requests
       const checks = [
         MainService.checkHealthTMDBService(),
         MainService.checkHealthMovieService(),
@@ -60,7 +58,6 @@ function Navbar() {
 
       const responses = await Promise.allSettled(checks);
 
-      // Process health check responses
       const failedResponses = responses
         .map((res, index) => {
           if (res.status === 'rejected' || !res.value) {
@@ -72,7 +69,6 @@ function Navbar() {
         })
         .filter(Boolean);
 
-      // Update alert state based on results
       if (failedResponses.length === 0) {
         setAlertType('success');
         setAlertCount(1);
@@ -109,14 +105,12 @@ function Navbar() {
 
   /**
    * Conditional Display Logic
-   * Determines when to show search bar and browse button based on route and screen size
    */
   const shouldShowSearchBar = !isMobile && location.pathname !== '/' && !location.pathname.includes('search');
   const shouldShowBrowseButton = (location.pathname === '/' || !isMobile) && location.pathname !== '/browse';
 
   /**
    * Route Prefetching Handlers
-   * Preloads data for smoother navigation
    */
   const handleBrowseHover = () => {
     PrefetchService.performPrefetch('Browse');
@@ -142,34 +136,19 @@ function Navbar() {
             gap: 2
           }}
         >
-          {/* Logo with Health Check Trigger */}
-          <img
-            src={logo}
-            alt="App Logo"
-            style={{
-              width: 150,
-              height: 'auto',
-              cursor: 'pointer',
-              borderRadius: '8px'
-            }}
-            onClick={handleTitleClick}
-          />
-          
-          {/* Desktop Search Bar Container */}
-          {!isMobile && (
-            <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-              {shouldShowSearchBar && <SearchBar />}
-            </Box>
-          )}
-          
-          {/* Navigation Controls */}
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center',
-            gap: 2,
-            marginLeft: 'auto'
-          }}>
-            {/* Home Navigation */}
+          {/* Logo and Stream Keeper Title */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <img
+              src={logo}
+              alt="App Logo"
+              style={{
+                width: 150,
+                height: 'auto',
+                cursor: 'pointer',
+                borderRadius: '8px'
+              }}
+              onClick={handleTitleClick}
+            />
             {location.pathname !== '/' && (
               <Typography
                 variant="h6"
@@ -186,8 +165,10 @@ function Navbar() {
                 Stream Keeper
               </Typography>
             )}
-            
-            {/* Browse Navigation */}
+          </Box>
+
+          {/* Navigation Controls */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             {shouldShowBrowseButton && (
               <Button
                 color="inherit"
@@ -206,6 +187,9 @@ function Navbar() {
                 Browse
               </Button>
             )}
+
+            {/* Search Bar */}
+            {shouldShowSearchBar && <SearchBar />}
           </Box>
         </Toolbar>
       </AppBar>
