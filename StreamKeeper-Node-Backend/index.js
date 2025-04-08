@@ -24,39 +24,55 @@ const validateApiKey = async () => {
   }
 };
 
-// Set up HTTP server (no SSL needed locally)
+/**
+ * Set up an HTTP server for handling API requests.
+ * No SSL is needed for local development.
+ * @param {number} port - The port number for the server.
+ * @param {Function} controller - The controller handling API routes.
+ * @param {string} routePath - The base route path for the API.
+ */
 const startServer = (port, controller, routePath) => {
+  // Initialize Express application
   const app = express();
 
+  // Enable JSON parsing and CORS support
   app.use(express.json());
   app.use(cors());
 
-  // Serve the frontend static files for port 3001
+  /**
+   * Serve static files for the frontend when running on port 3001.
+   * This ensures the frontend is accessible in a local development environment.
+   */
   if (port === 3001) {
-    app.use(express.static(path.join(__dirname, 'view')));
-    
-    app.get('/validate', async (req, res) => {
-      try {
-        await fetchFromTmdb('/configuration');
-        res.status(200).send('API key is valid.');
-      } catch (error) {
-        res.status(500).send('API key is invalid or TMDB service is unavailable.');
-      }
-    });
+      app.use(express.static(path.join(__dirname, 'view')));
+
+      /**
+       * Endpoint to validate the TMDB API key.
+       * Fetches the TMDB configuration endpoint to verify connectivity.
+       */
+      app.get('/validate', async (req, res) => {
+          try {
+              await fetchFromTmdb('/configuration');
+              res.status(200).send('API key is valid.');
+          } catch (error) {
+              res.status(500).send('API key is invalid or TMDB service is unavailable.');
+          }
+      });
   }
 
-  // Set up routes for all APIs
+  // Set up routes for API handling
   app.use(routePath, controller);
 
+  // Configure Swagger for API documentation
   swaggerSetup(app);
 
-  // Create regular HTTP server
+  // Create and start an HTTP server instance
   const server = http.createServer(app);
-  
   server.listen(port, () => {
-    console.log(`Server for ${routePath} running at http://localhost:${port}`);
+      console.log(`Server for ${routePath} running at http://localhost:${port}`);
   });
 };
+
 
 const initialize = async () => {
   const isValid = await validateApiKey();

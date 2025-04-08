@@ -1,3 +1,22 @@
+/**
+ * ProviderList.js
+ * Displays available streaming providers for movies/TV shows
+ * 
+ * Features:
+ * - Fetches and displays watch providers from TMDB API
+ * - Organizes providers by category (Stream/Rent/Buy/Ads)
+ * - Responsive chip-based UI with hover effects
+ * - Loading and error states
+ * - Fallback avatar for providers without logos
+ * 
+ * Component Structure:
+ * - Loading indicator (during fetch)
+ * - Error message (if fetch fails)
+ * - Provider categories section
+ *   - Category heading
+ *   - Provider chips (with logos)
+ */
+
 import React, { useEffect, useState } from 'react';
 import MainService from '../../services/MainService';
 import {
@@ -9,26 +28,41 @@ import {
   Alert,
 } from '@mui/material';
 
+/**
+ * ProviderList Component
+ * @param {string} mediaId - TMDB ID of the movie/TV show
+ * @param {string} mediaType - Type of media ('movie' or 'tv')
+ */
 function ProviderList({ mediaId, mediaType }) {
-  const [watchProviders, setWatchProviders] = useState(null); // State to store watch provider data
-  const [loading, setLoading] = useState(true); // State to track loading status
-  const [errorMessage, setErrorMessage] = useState(''); // State to store error messages
+  // Component State
+  const [watchProviders, setWatchProviders] = useState(null); // Stores normalized provider data
+  const [loading, setLoading] = useState(true); // Tracks data fetching status
+  const [errorMessage, setErrorMessage] = useState(''); // Stores error messages
 
-  // Fetch watch provider data when component mounts or when mediaId/mediaType changes
+  /**
+   * Data Fetching Effect
+   * Fetches watch providers when component mounts or mediaId/mediaType changes
+   * Handles:
+   * - Different API endpoints for movies vs TV shows
+   * - Region prioritization (US first)
+   * - Error states
+   * - Loading states
+   */
   useEffect(() => {
     const fetchWatchProviders = async () => {
       try {
         let providerData;
-        // Fetch watch provider data based on the media type (movie or TV)
+        
+        // Route to appropriate service based on media type
         if (mediaType === 'movie') {
           providerData = await MainService.getMovieWatchProviders(mediaId);
         } else if (mediaType === 'tv') {
           providerData = await MainService.getTvShowWatchProviders(mediaId);
         } else {
-          throw new Error('Invalid media type'); // Handle invalid media types
+          throw new Error('Invalid media type');
         }
 
-        // Extract watch providers for the US or use the first available region
+        // Normalize provider data - prefer US region or fallback to first available
         const countryProviders =
           providerData && Object.keys(providerData).length > 0
             ? providerData.US || Object.values(providerData)[0]
@@ -36,68 +70,83 @@ function ProviderList({ mediaId, mediaType }) {
 
         setWatchProviders(countryProviders);
       } catch (error) {
-        // Handle errors
+        console.error('Fetch error:', error);
         setErrorMessage('An error occurred while fetching watch providers.');
       } finally {
-        // Set loading to false after fetching is complete
         setLoading(false);
       }
     };
 
-    // Only fetch data if mediaId and mediaType are provided
+    // Only fetch if required props are available
     if (mediaId && mediaType) fetchWatchProviders();
   }, [mediaId, mediaType]);
 
-  // Display a loading indicator while data is being fetched
-  if (loading) return <CircularProgress />;
-  // Display an error message if an error occurred during data fetching
-  if (errorMessage) return <Alert severity="error">{errorMessage}</Alert>;
-  // Return null if no watch providers are found
-  if (!watchProviders) return null;
+  /**
+   * Render States
+   * Handles conditional rendering based on component state
+   */
+  if (loading) return <CircularProgress />; // Loading indicator
+  if (errorMessage) return <Alert severity="error">{errorMessage}</Alert>; // Error state
+  if (!watchProviders) return null; // No providers available
 
-  // Define provider categories to render dynamically
+  /**
+   * Provider Categories Configuration
+   * Defines the display structure for different purchase types
+   * Each category will only render if providers exist for that type
+   */
   const providerCategories = [
-    { key: 'flatrate', label: 'Stream' },
-    { key: 'rent', label: 'Rent' },
-    { key: 'buy', label: 'Buy' },
-    { key: 'ads', label: 'Watch with Ads' },
+    { key: 'flatrate', label: 'Stream' }, // Subscription services
+    { key: 'rent', label: 'Rent' }, // Rental options
+    { key: 'buy', label: 'Buy' }, // Purchase options
+    { key: 'ads', label: 'Watch with Ads' }, // Ad-supported viewing
   ];
 
   return (
     <Box mt={2}>
+      {/* Section Header */}
       <Typography variant="h6">Where to Watch</Typography>
+      
+      {/* Dynamic Provider Categories */}
       {providerCategories.map(
         (category) =>
+          // Only render category if providers exist
           watchProviders[category.key] && watchProviders[category.key].length > 0 && (
             <Box mt={1} key={category.key}>
+              {/* Category Heading */}
               <Typography variant="subtitle1">{category.label}</Typography>
+              
+              {/* Provider Chips Container */}
               <Box display="flex" flexWrap="wrap" gap={1}>
                 {watchProviders[category.key].map((provider) => (
                   <Chip
-                    key={provider.provider_id} // Unique key for each provider
-                    label={provider.provider_name} // Display provider name
+                    key={provider.provider_id}
+                    label={provider.provider_name}
                     avatar={
-                      provider.logo_path ? ( // Display provider logo if available
+                      provider.logo_path ? (
+                        // TMDB logo image (45px width)
                         <Avatar src={`https://image.tmdb.org/t/p/w45${provider.logo_path}`} />
                       ) : (
-                        <Avatar>{provider.provider_name[0]}</Avatar> // Fallback to first letter of provider name
+                        // Fallback avatar with first letter
+                        <Avatar>{provider.provider_name[0]}</Avatar>
                       )
                     }
                     sx={{
-                      backgroundColor: '#D3D3D3', // Pre-hover color (off-white)
-                      color: '#000000', // Text color
-                      boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.6)' ,
+                      // Base chip styling
+                      backgroundColor: '#D3D3D3',
+                      color: '#000000',
+                      boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.6)',
                       transition: 'all 0.3s ease-in-out',
+                      
+                      // Hover effects
                       '&:hover': {
-                        backgroundColor: 'white', // Hover color
-                        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)', // Drop shadow on hover
-                        transform: 'translateY(-2px) scale(.95)', // Slight elevation
-                         
-                        
+                        backgroundColor: 'white',
+                        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)',
+                        transform: 'translateY(-2px) scale(.95)',
                       },
                     }}
-                    component="a" // Render as a link
-                    href={watchProviders.link} // Link to the provider's page
+                    // Link behavior
+                    component="a"
+                    href={watchProviders.link}
                     target="_blank"
                     rel="noopener noreferrer"
                     clickable

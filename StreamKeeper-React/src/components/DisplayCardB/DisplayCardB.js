@@ -5,8 +5,31 @@ import { useNavigate } from 'react-router-dom';
 import MainService from '../../services/MainService';
 import PrefetchService from '../../services/PrefetchService';
 
+/**
+ * DisplayCardB Component
+ * A versatile card component for displaying media (movies, TV shows, persons) with hover effects
+ * Features:
+ * - Dynamic content based on media type
+ * - Person image fetching
+ * - Prefetching on hover
+ * - Customizable dimensions
+ * - Rating display for non-person media
+ * - Click navigation to detail pages
+ */
 const prefetchService = PrefetchService; // Singleton PrefetchService instance
 
+/**
+ * @param {Object} props - Component props
+ * @param {Object} props.media - Media object containing details to display
+ * @param {number} [props.minWidth=275] - Minimum card width
+ * @param {number|string} [props.maxWidth='100%'] - Maximum card width
+ * @param {number} [props.minHeight=300] - Minimum card height
+ * @param {number|string} [props.maxHeight='auto'] - Maximum card height
+ * @param {number} [props.fixedWidth] - Fixed width override
+ * @param {number} [props.fixedHeight] - Fixed height override
+ * @param {Function} [props.onClick] - Custom click handler
+ * @param {boolean} [props.disableClick=false] - Disable click behavior
+ */
 function DisplayCardB({
   media,
   minWidth = 275,
@@ -21,6 +44,11 @@ function DisplayCardB({
   const navigate = useNavigate();
   const [personImage, setPersonImage] = useState('');
 
+  /**
+   * Person Image Fetching Effect
+   * Fetches additional images for Person type media
+   * Only runs when media type is 'Person'
+   */
   useEffect(() => {
     if (media.mediaType === 'Person') {
       const fetchPersonImage = async () => {
@@ -39,6 +67,11 @@ function DisplayCardB({
     }
   }, [media]);
 
+  /**
+   * Card Click Handler
+   * Navigates to appropriate detail page based on media type
+   * Respects disableClick prop and custom onClick handler
+   */
   const handleCardClick = () => {
     if (disableClick) return;
     onClick?.();
@@ -59,12 +92,17 @@ function DisplayCardB({
     }
   };
 
+  /**
+   * Card Hover Handler
+   * Triggers prefetching of additional data when hovering over card
+   */
   const handleCardHover = () => {
     if (media.mediaType) {
       prefetchService.executePrefetch(media.mediaType, media.mediaType, media.id);
     }
   };
 
+  // Extract media properties with fallbacks
   const {
     title = media.name || media.title || 'Unnamed',
     description = media.mediaType === 'Person'
@@ -78,11 +116,13 @@ function DisplayCardB({
     imageUrl = media.mediaType === 'Person' ? personImage : media.posterUrl || media.backdropUrl || '',
   } = media;
 
+  // Format known for information for Person type
   const knownFor =
     media.mediaType === 'Person' && media.knownFor
       ? media.knownFor.slice(0, 2).map(item => item.name || item.title).join(', ')
       : '';
 
+  // Card style configuration
   const cardStyles = {
     minWidth: fixedWidth || minWidth,
     maxWidth: fixedWidth || maxWidth,
@@ -131,23 +171,35 @@ function DisplayCardB({
             borderRadius: 1,
           }}
         >
+          {/* Media Image Section */}
           <CardMedia
             component="img"
             image={imageUrl}
             alt={title}
             sx={{ height: 300 }}
           />
+          
+          {/* Content Section */}
           <CardContent sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, pb: 1 }}>
+            {/* Title */}
             <Typography variant="h6">{title}</Typography>
+            
+            {/* Description */}
             <Typography variant="body2" color="text.secondary" gutterBottom>
               {description}
             </Typography>
+            
+            {/* Known For (Person type only) */}
             {media.mediaType === 'Person' && knownFor && (
               <Typography variant="body2" color="text.secondary">
                 Known For: {knownFor}
               </Typography>
             )}
+            
+            {/* Spacer to push rating to bottom */}
             <Box sx={{ flexGrow: 1 }} />
+            
+            {/* Rating Section (Non-person media only) */}
             {media.mediaType !== 'Person' && (
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 1 }}>
                 <Rating value={rating / 2} precision={0.1} readOnly />
@@ -163,6 +215,10 @@ function DisplayCardB({
   );
 }
 
+/**
+ * Prop Type Validation
+ * Defines the expected shape and types of all component props
+ */
 DisplayCardB.propTypes = {
   media: PropTypes.shape({
     mediaType: PropTypes.string,

@@ -82,60 +82,90 @@ class CacheManager {
         return newCount; // Return updated count
     }
 
-    // Handles fetching and caching logic for a given endpoint and parameters
+
+    /**
+     * Handles fetching and caching logic for a given endpoint and parameters.
+     * @param {string} endpoint - The API endpoint being requested.
+     * @param {object} params - Query parameters for the request.
+     * @param {Function} fetchFunction - Function to fetch data if not in cache.
+     * @returns {Promise<any>} - The fetched or cached data.
+     */
     async handle(endpoint, params, fetchFunction) {
+        /**
+         * Bypass caching for blacklisted endpoints.
+         * Directly fetch data without storing it.
+         */
         if (this.blacklistedEndpoints.has(endpoint)) {
-            return await fetchFunction(); // Bypass cache for blacklisted endpoints
+            return await fetchFunction();
         }
 
-        const key = `${endpoint}_${JSON.stringify(params)}`; // Create a unique key for the cache
-        const isPrimaryEndpoint = this.primaryEndpoints.has(endpoint); // Check if the endpoint is primary
+        // Generate a unique key based on endpoint and parameters
+        const key = `${endpoint}_${JSON.stringify(params)}`;
+        // Determine if the endpoint belongs to the primary category
+        const isPrimaryEndpoint = this.primaryEndpoints.has(endpoint);
 
+        /**
+         * Reset favorite cache if conditions require it.
+         * This ensures stale data is cleared at appropriate intervals.
+         */
         if (this.needsFavoriteCacheReset()) {
-            this.favoriteCache.clear(); // Clear favorite cache if reset is needed
-            this.lastFavoriteReset = new Date(); // Update last reset timestamp
+            this.favoriteCache.clear();
+            this.lastFavoriteReset = new Date();
         }
 
-        // Handle primary endpoints in base cache
+        /**
+         * Handle caching for primary endpoints.
+         * These are stored in the base cache and refreshed based on conditions.
+         */
         if (isPrimaryEndpoint) {
             if (this.needsBaseCacheRefresh()) {
-                this.baseCache.clear(); // Clear base cache if refresh is needed
-                this.lastBaseRefresh = new Date(); // Update last refresh timestamp
+                this.baseCache.clear();
+                this.lastBaseRefresh = new Date();
             }
             if (this.baseCache.has(key)) {
-                return this.baseCache.get(key); // Return cached data if available
+                return this.baseCache.get(key);
             }
         } else {
-            // Check favorite cache first
+            /**
+             * First, check the favorite cache for data.
+             * If found, return it immediately.
+             */
             if (this.favoriteCache.has(key)) {
-                return this.favoriteCache.get(key); // Return cached data if available
+                return this.favoriteCache.get(key);
             }
 
-            // Then check flex cache
+            /**
+             * Next, check the flex cache for data.
+             * If found, reprioritize and return it.
+             */
             if (this.flexCache.has(key)) {
-                const value = this.flexCache.get(key); // Retrieve the value from flex cache
-                this.incrementAccessCount(key); // Update access count
-                this.moveToTopOfFlex(key, value); // Reprioritize entry in flex cache
-                return value; // Return cached data
+                const value = this.flexCache.get(key);
+                this.incrementAccessCount(key);
+                this.moveToTopOfFlex(key, value);
+                return value;
             }
         }
 
-        // If not in any cache, fetch and store
+        /**
+         * If data is not found in any cache, fetch from the source.
+         * The result is then stored in the appropriate cache.
+         */
         try {
-            const data = await fetchFunction(); // Fetch data from external source
-            
+            const data = await fetchFunction();
+
             if (isPrimaryEndpoint) {
-                this.baseCache.set(key, data); // Store data in base cache for primary endpoints
+                this.baseCache.set(key, data);
             } else {
-                this.moveToTopOfFlex(key, data); // Store data in flex cache
-                this.incrementAccessCount(key); // Increment access count
+                this.moveToTopOfFlex(key, data);
+                this.incrementAccessCount(key);
             }
-            
-            return data; // Return fetched data
+
+            return data;
         } catch (error) {
-            throw error; // Re-throw error for upstream handling
+            throw error; // Propagate the error for external handling
         }
     }
+
 }
 
 // Create and export singleton instance

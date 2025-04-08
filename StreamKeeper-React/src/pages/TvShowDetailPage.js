@@ -1,40 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom'; // Import hook to access route parameters
-import MainService from '../services/MainService'; // Service to fetch TV show data
-import { Container, Typography, CircularProgress, Alert, Box, Grid, Rating } from '@mui/material';
-import TvShow from '../models/TvShow'; // TVShow model
-import ProviderList from '../components/ProviderList/ProviderList'; // Component for displaying watch providers
-import DisplayCardCarousel from '../components/DisplayCardCarousel/DisplayCardCarousel'; // Carousel component for recommendations and similar shows
+/**
+ * TvShowDetailPage.js
+ * 
+ * This component displays detailed information about a TV show, including:
+ * - Show poster and basic info
+ * - Streaming provider availability
+ * - Show overview and metadata
+ * - Recommendations and similar shows
+ * 
+ * Data Flow:
+ * 1. Gets TV show ID from URL parameters
+ * 2. Fetches show details, recommendations, and similar shows
+ * 3. Displays loading state while fetching
+ * 4. Renders content or error message
+ */
 
-// Define color variables
-const WHITE = "white";
-const OFF_WHITE = "#D3D3D4";
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom'; // Hook to access URL parameters
+import MainService from '../services/MainService'; // Service for API requests
+import { Container, Typography, CircularProgress, Alert, Box, Grid, Rating } from '@mui/material';
+import TvShow from '../models/TvShow'; // TVShow model class
+import ProviderList from '../components/ProviderList/ProviderList'; // Component for streaming providers
+import DisplayCardCarousel from '../components/DisplayCardCarousel/DisplayCardCarousel'; // Component for recommendations
+
+// Color constants for consistent styling
+const WHITE = "white"; // Primary text color
+const OFF_WHITE = "#D3D3D4"; // Secondary text color
 
 function TvShowDetailPage() {
-  const { id } = useParams(); // Get TV show ID from route parameters
-  const [tvShow, setTvShow] = useState(null); // State to store TV show details
-  const [loading, setLoading] = useState(true); // State to manage loading state
-  const [errorMessage, setErrorMessage] = useState(''); // State to store error messages
-  const [recommendations, setRecommendations] = useState([]); // State for storing recommended shows
-  const [similarTvShows, setSimilarTvShows] = useState([]); // State for storing similar TV shows
+  // Get TV show ID from URL parameters
+  const { id } = useParams();
 
-  // Fetch TV show details and related data when component mounts or when the ID changes
+  // State management
+  const [tvShow, setTvShow] = useState(null); // Stores TV show details
+  const [loading, setLoading] = useState(true); // Toggles loading state
+  const [errorMessage, setErrorMessage] = useState(''); // Stores error messages
+  const [recommendations, setRecommendations] = useState([]); // Stores recommended shows
+  const [similarTvShows, setSimilarTvShows] = useState([]); // Stores similar shows
+
+  /**
+   * useEffect hook for data fetching
+   * Runs when component mounts or when ID changes
+   * Fetches:
+   * - TV show details
+   * - Recommended shows
+   * - Similar shows
+   */
   useEffect(() => {
+    // Fetches primary TV show details
     const fetchTvShowDetails = async () => {
       try {
-        const data = await MainService.getTvShowById(id); // Fetch TV show details using service
-        const tvShowInstance = new TvShow(data); // Create a new TvShow instance
-        setTvShow(tvShowInstance);
+        const data = await MainService.getTvShowById(id); // API call
+        const tvShowInstance = new TvShow(data); // Create TvShow model instance
+        setTvShow(tvShowInstance); // Update state
       } catch (error) {
         setErrorMessage('An error occurred while fetching the TV show details.');
       } finally {
-        setLoading(false); // Stop loading indicator
+        setLoading(false); // End loading
       }
     };
 
+    // Fetches recommended TV shows
     const fetchRecommendations = async () => {
       try {
-        const recommendedData = await MainService.getTvShowRecommendations(id); // Fetch recommended TV shows
+        const recommendedData = await MainService.getTvShowRecommendations(id);
         const transformedRecommendations = recommendedData.map(item => new TvShow(item));
         setRecommendations(transformedRecommendations);
       } catch (error) {
@@ -42,9 +70,10 @@ function TvShowDetailPage() {
       }
     };
   
+    // Fetches similar TV shows
     const fetchSimilarTvShows = async () => {
       try {
-        const similarData = await MainService.getSimilarTvShows(id); // Fetch similar TV shows
+        const similarData = await MainService.getSimilarTvShows(id);
         const transformedSimilarShows = similarData.map(item => new TvShow(item));
         setSimilarTvShows(transformedSimilarShows);
       } catch (error) {
@@ -52,97 +81,114 @@ function TvShowDetailPage() {
       }
     };
 
+    // Execute all fetches if ID exists
     if (id) {
       fetchTvShowDetails();
       fetchRecommendations();
       fetchSimilarTvShows();
     }
-  }, [id]); // Dependency array ensures this runs when the ID changes
+  }, [id]); // Dependency array ensures effect runs when ID changes
 
-  // Display a loading spinner while data is being fetched
+  // Loading state UI
   if (loading) {
     return (
       <Container style={{ marginTop: '20px', textAlign: 'center' }}>
-        <CircularProgress />
+        <CircularProgress /> {/* Material-UI loading spinner */}
       </Container>
     );
   }
 
-  // Display an error message if an error occurs
+  // Error state UI
   if (errorMessage) {
     return (
       <Container style={{ marginTop: '20px' }}>
-        <Alert severity="error">{errorMessage}</Alert>
+        <Alert severity="error">{errorMessage}</Alert> {/* Material-UI error alert */}
       </Container>
     );
   }
 
+  // Main component render
   return (
     <Container style={{ marginTop: '20px' }}>
+      {/* Main content grid - 2 columns on desktop, stacked on mobile */}
       <Grid container spacing={4}>
-        {/* Left Column: TV Show Poster and Watch Providers */}
+        {/* Left Column (Poster and Providers) */}
         <Grid item xs={12} md={4}>
+          {/* TV Show Poster Image */}
           <Box>
             <img
-              src={tvShow?.posterUrl || 'placeholder.jpg'} // Display TV show poster or placeholder image
+              src={tvShow?.posterUrl || 'placeholder.jpg'} // Fallback to placeholder if no poster
               alt={tvShow?.name || 'TV Show Poster'}
               style={{ 
                 width: '100%', 
                 borderRadius: '8px',
-                boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.6)' // Drop shadow added here
+                boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.6)' // Visual enhancement
               }}
             />
           </Box>
-          {/* Display watch providers */}
-          <ProviderList mediaId={id} mediaType="tv" />
+          
+          {/* Streaming Providers List */}
+          <ProviderList 
+            mediaId={id} 
+            mediaType="tv" // Specifies we're showing TV providers
+          />
         </Grid>
 
-        {/* Right Column: TV Show Details */}
+        {/* Right Column (Show Details) */}
         <Grid item xs={12} md={8}>
-          {/* TV Show Title and Release Year */}
+          {/* Show Title and Year */}
           <Typography variant="h4" gutterBottom style={{ color: WHITE }}>
             {tvShow?.name || 'N/A'}{' '}
             <Typography variant="subtitle1" component="span" style={{ color: WHITE }}>
-              (
-              {tvShow?.firstAirDate ? tvShow.firstAirDate.split('-')[0] : 'Unknown'}
-              )
+              ({tvShow?.firstAirDate ? tvShow.firstAirDate.split('-')[0] : 'Unknown'})
             </Typography>
           </Typography>
-          {/* Display Original Name */}
+          
+          {/* Original Title */}
           <Typography variant="subtitle1" style={{ color: WHITE }} gutterBottom>
             Original Name: <span style={{ color: OFF_WHITE }}>{tvShow?.originalName || 'N/A'}</span>
           </Typography>
-          {/* Display Overview */}
+          
+          {/* Show Overview */}
           <Typography variant="body1" paragraph style={{ color: OFF_WHITE }}>
             {tvShow?.overview || 'No overview available.'}
           </Typography>
 
-          {/* TV Show Metadata */}
+          {/* Show Metadata Section */}
           <Box my={2}>
             <Typography variant="h6" style={{ color: WHITE }}>TV Show Information</Typography>
+            
+            {/* Metadata Grid - 2 columns on mobile, 4 on desktop */}
             <Grid container spacing={2}>
               {/* First Air Date */}
               <Grid item xs={6}>
                 <Typography variant="body2" style={{ color: WHITE }}>
                   First Air Date:
                 </Typography>
-                <Typography variant="body1" style={{ color: OFF_WHITE }}>{tvShow?.firstAirDate || 'Unknown'}</Typography>
+                <Typography variant="body1" style={{ color: OFF_WHITE }}>
+                  {tvShow?.firstAirDate || 'Unknown'}
+                </Typography>
               </Grid>
-              {/* Popularity */}
+              
+              {/* Popularity Score */}
               <Grid item xs={6}>
                 <Typography variant="body2" style={{ color: WHITE }}>
                   Popularity:
                 </Typography>
-                <Typography variant="body1" style={{ color: OFF_WHITE }}>{tvShow?.popularity?.toFixed(1) || 'N/A'}</Typography>
+                <Typography variant="body1" style={{ color: OFF_WHITE }}>
+                  {tvShow?.popularity?.toFixed(1) || 'N/A'}
+                </Typography>
               </Grid>
-              {/* Vote Average */}
+              
+              {/* User Rating */}
               <Grid item xs={6}>
                 <Typography variant="body2" style={{ color: WHITE }}>
                   Vote Average:
                 </Typography>
+                {/* Material-UI rating component (converted from 10 to 5 star scale) */}
                 <Rating
                   name="read-only"
-                  value={tvShow?.voteAverage / 2 || 0} // Convert 10-point scale to 5-point scale for display
+                  value={tvShow?.voteAverage / 2 || 0}
                   readOnly
                   precision={0.1}
                 />
@@ -150,17 +196,20 @@ function TvShowDetailPage() {
                   {tvShow?.voteAverage ? tvShow.voteAverage.toFixed(1) : 'N/A'} / 10
                 </Typography>
               </Grid>
+              
               {/* Vote Count */}
               <Grid item xs={6}>
                 <Typography variant="body2" style={{ color: WHITE }}>
                   Vote Count:
                 </Typography>
-                <Typography variant="body1" style={{ color: OFF_WHITE }}>{tvShow?.voteCount || 'N/A'}</Typography>
+                <Typography variant="body1" style={{ color: OFF_WHITE }}>
+                  {tvShow?.voteCount || 'N/A'}
+                </Typography>
               </Grid>
             </Grid>
           </Box>
 
-          {/* Backdrop Image */}
+          {/* Backdrop Image (if available) */}
           {tvShow?.backdropUrl && (
             <Box my={2}>
               <Typography variant="h6" style={{ color: WHITE }}>Backdrop</Typography>
@@ -171,7 +220,7 @@ function TvShowDetailPage() {
                   width: '100%', 
                   borderRadius: '8px', 
                   marginTop: '10px',
-                  boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.6)' // Drop shadow added here
+                  boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.6)'
                 }}
               />
             </Box>
@@ -179,23 +228,29 @@ function TvShowDetailPage() {
         </Grid>
       </Grid>
 
-      {/* Recommended TV Shows Carousel */}
+      {/* Recommended Shows Carousel */}
       {recommendations.length > 0 && (
         <Box my={4}>
           <Typography variant="h5" gutterBottom style={{ color: WHITE }}>
             Recommended TV Shows
           </Typography>
-          <DisplayCardCarousel items={recommendations} cardType="A" />
+          <DisplayCardCarousel 
+            items={recommendations} 
+            cardType="A" // Specifies card style
+          />
         </Box>
       )}
 
-      {/* Similar TV Shows Carousel */}
+      {/* Similar Shows Carousel */}
       {similarTvShows.length > 0 && (
         <Box my={4}>
           <Typography variant="h5" gutterBottom style={{ color: WHITE }}>
             Similar TV Shows
           </Typography>
-          <DisplayCardCarousel items={similarTvShows} cardType="A" />
+          <DisplayCardCarousel 
+            items={similarTvShows} 
+            cardType="A" // Specifies card style
+          />
         </Box>
       )}
     </Container>

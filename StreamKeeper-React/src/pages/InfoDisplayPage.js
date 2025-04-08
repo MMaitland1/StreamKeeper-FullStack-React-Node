@@ -1,80 +1,129 @@
+/**
+ * InfoDisplayPage.js
+ * 
+ * A responsive page component for displaying categorized media collections.
+ * 
+ * Key Features:
+ * - Dynamic routing with React Router
+ * - Responsive grid layout adapting to all screen sizes
+ * - Media card display with consistent styling
+ * - Empty state handling
+ * - Mobile-first design approach
+ * 
+ * Component Structure:
+ * 1. Container (root layout)
+ *   1.1 Title section
+ *   1.2 Content container
+ *     1.2.1 Grid layout (for media items)
+ *     1.2.2 Empty state message
+ */
+
 import React from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Typography, Container, Grid, useTheme, useMediaQuery } from '@mui/material';
 import DisplayCardB from '../components/DisplayCardB/DisplayCardB';
 
-/**
- * InfoDisplayPage - A responsive page component for displaying a collection of media items
- * 
- * Key Features:
- * - Uses React Router for dynamic routing and parameter extraction
- * - Implements responsive design using Material-UI's useMediaQuery
- * - Dynamically renders media items in a grid layout
- * - Adapts layout and styling based on screen size (mobile vs desktop)
- */
 function InfoDisplayPage() {
-  // Extract topic from URL parameters
-  const { topic } = useParams();
-
-  // Access location state to retrieve media array
+  /**
+   * Router Hooks
+   * - useParams: Extracts dynamic route parameters
+   * - useLocation: Accesses navigation state
+   */
+  const { topic } = useParams(); // Gets the category topic from URL
   const location = useLocation();
-  const { mediaArray = [] } = location.state || {};
+  const { mediaArray = [] } = location.state || {}; // Retrieves media data from navigation state
 
-  // Use Material-UI theming and media query hooks for responsive design
+  /**
+   * Responsive Design Hooks
+   * - useTheme: Access to Material-UI theme
+   * - useMediaQuery: Detects mobile viewport (650px breakpoint)
+   */
   const theme = useTheme();
   const isMobile = useMediaQuery('(max-width:650px)');
 
-  // Responsive styles object with conditional styling based on screen size
-  const mobileStyles = {
-    // Container styles: adjust layout and padding for mobile/desktop
+  /**
+   * Responsive Styles Object
+   * Contains conditional styling based on viewport size
+   * Organized by component section for maintainability
+   */
+  const responsiveStyles = {
+    // Root container styles
     container: {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       width: '100%',
-      padding: isMobile ? '16px 8px' : '16px',
+      padding: isMobile ? '16px 8px' : '16px', // Tighter padding on mobile
     },
-    // Title styles: adjust text alignment, size, and spacing
+    
+    // Title section styles
     title: {
       textAlign: isMobile ? 'center' : 'left',
       width: '100%',
-      fontSize: isMobile ? '1.9rem' : '2.125rem',
+      fontSize: isMobile ? '1.9rem' : '2.125rem', // Larger text on desktop
       marginBottom: '2rem',
+      fontWeight: 500, // Medium weight for better readability
+      color: theme.palette.text.primary, // Uses theme color
     },
-    // Grid item styles: adjust width for different screen sizes
+    
+    // Grid item styles
     gridItem: {
-      width: isMobile ? '75%' : 'auto',
+      width: isMobile ? '75%' : 'auto', // Constrained width on mobile
+      transition: 'all 0.3s ease', // Smooth resizing animation
     },
-    // Content container styles: add spacing and full width
+    
+    // Content container styles
     contentContainer: {
       marginTop: '1.5rem',
       width: '100%',
+      minHeight: '50vh', // Ensures consistent spacing
     },
   };
 
   return (
-    <Container sx={mobileStyles.container}>
-      {/* Page title displaying the topic */}
+    <Container 
+      sx={responsiveStyles.container}
+      maxWidth="xl" // Uses extra-large container width
+    >
+      {/* 
+        Page Title Section
+        Displays the category topic from route parameters 
+      */}
       <Typography 
         variant="h4" 
         gutterBottom 
-        sx={mobileStyles.title}
+        sx={{...responsiveStyles.title, color: "white"}}
+        component="h1" // Semantic HTML heading
       >
         {topic}
       </Typography>
 
-      {/* Content container with conditional rendering */}
-      <div style={mobileStyles.contentContainer}>
+      {/* 
+        Main Content Container
+        Conditionally renders either media grid or empty state
+      */}
+      <div style={responsiveStyles.contentContainer}>
         {mediaArray.length > 0 ? (
-          // Grid layout for media items
+          /**
+           * Media Items Grid
+           * - Adapts layout based on screen size
+           * - Mobile: Single column
+           * - Tablet: 2 columns
+           * - Desktop: 3-4 columns
+           */
           <Grid 
             container 
-            spacing={3}
+            spacing={3} // Consistent gutter between items
             direction={isMobile ? 'column' : 'row'}
             alignItems={isMobile ? 'center' : 'flex-start'}
+            justifyContent={isMobile ? 'center' : 'flex-start'}
           >
-            {/* Render each media item using DisplayCardB component */}
+            {/* 
+              Media Item Mapping
+              Renders each item using DisplayCardB component
+              with responsive sizing
+            */}
             {mediaArray.map((media, index) => (
               <Grid 
                 item 
@@ -82,30 +131,39 @@ function InfoDisplayPage() {
                 sm={isMobile ? 12 : 6}
                 md={isMobile ? 12 : 4}
                 lg={isMobile ? 12 : 3}
-                key={index}
-                sx={mobileStyles.gridItem}
+                key={`${media.id}-${index}`} // More unique key
+                sx={responsiveStyles.gridItem}
               >
                 <DisplayCardB
                   media={media}
                   minWidth={275}
-                  maxWidth={ 400}
+                  maxWidth={400}
                   minHeight={500}
                   sx={{
                     width: isMobile ? '100%' : 'auto',
                     margin: '0 auto',
+                    height: '100%', // Ensures consistent card heights
                   }}
                 />
               </Grid>
             ))}
           </Grid>
         ) : (
-          // Fallback text when no media items are available
+          /**
+           * Empty State
+           * Shown when no media items are available
+           */
           <Typography 
             variant="body1" 
             color="text.secondary"
             textAlign={isMobile ? 'center' : 'left'}
+            sx={{
+              padding: 4,
+              borderRadius: 2,
+              backgroundColor: theme.palette.background.default,
+            }}
           >
-            No items available.
+            No items available in this category.
           </Typography>
         )}
       </div>
@@ -113,9 +171,23 @@ function InfoDisplayPage() {
   );
 }
 
-// PropTypes for type checking and documentation
+/**
+ * Prop Type Validation
+ * Documents expected props and their types
+ */
 InfoDisplayPage.propTypes = {
-  mediaArray: PropTypes.array,
+  /**
+   * Array of media objects to display
+   * Retrieved from React Router location state
+   */
+  mediaArray: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      title: PropTypes.string,
+      posterUrl: PropTypes.string,
+      // Add other expected media properties as needed
+    })
+  ),
 };
 
 export default InfoDisplayPage;

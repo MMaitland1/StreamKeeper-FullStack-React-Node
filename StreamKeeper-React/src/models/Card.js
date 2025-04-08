@@ -2,7 +2,7 @@
 import Media from './Media';
 import Person from './Person';
 import Movie from './Movie';
-import TVShow from './TVShow';
+import TvShow from './TvShow';
 
 class Card extends Media {
   constructor(data) {
@@ -20,7 +20,7 @@ class Card extends Media {
       this.description = data.overview || '';
       this.imageUrl = data.posterUrl; // Assumes poster URL is provided in data
       this.rating = data.voteAverage;
-    } else if (data instanceof TVShow) {
+    } else if (data instanceof TvShow) {
       this.mediaType = 'TvShow';
       this.name = data.name;
       this.description = data.overview || '';

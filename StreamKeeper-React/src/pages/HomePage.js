@@ -1,3 +1,21 @@
+/**
+ * HomePage.js
+ * 
+ * The main landing page featuring:
+ * - Featured movie carousel with auto-rotation
+ * - Search functionality with current movie context
+ * - Tabbed browsing for movies and TV shows
+ * - Responsive design for all screen sizes
+ * - Lazy-loaded content sections
+ * 
+ * Key Features:
+ * - Dynamic data fetching based on tab selection
+ * - Double-click navigation to full category pages
+ * - Hover-based prefetching
+ * - Responsive typography and layouts
+ * - Loading state management
+ */
+
 import React, { useEffect, useState } from 'react';
 import { Container, CircularProgress, Box, Typography, Tabs, Tab } from '@mui/material';
 import MainService from '../services/MainService';
@@ -9,28 +27,36 @@ import SearchBar from '../components/SearchBar/SearchBar';
 import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
-  const [popularMovies, setPopularMovies] = useState([]);
-  const [topRatedMovies, setTopRatedMovies] = useState([]);
-  const [upcomingMovies, setUpcomingMovies] = useState([]);
-  const [popularTVShows, setPopularTVShows] = useState([]);
-  const [topRatedTVShows, setTopRatedTVShows] = useState([]);
-  const [onAirTVShows, setOnAirTVShows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentMovie, setCurrentMovie] = useState(null);
-  const [movieTab, setMovieTab] = useState(0);
-  const [tvTab, setTvTab] = useState(0);
+  // State Management
+  const [popularMovies, setPopularMovies] = useState([]); // Popular movies data
+  const [topRatedMovies, setTopRatedMovies] = useState([]); // Top rated movies
+  const [upcomingMovies, setUpcomingMovies] = useState([]); // Upcoming movies
+  const [popularTVShows, setPopularTVShows] = useState([]); // Popular TV shows
+  const [topRatedTVShows, setTopRatedTVShows] = useState([]); // Top rated TV shows
+  const [onAirTVShows, setOnAirTVShows] = useState([]); // Currently airing TV shows
+  const [loading, setLoading] = useState(true); // Loading state
+  const [currentMovie, setCurrentMovie] = useState(null); // Currently featured movie
+  const [movieTab, setMovieTab] = useState(0); // Active movies tab index
+  const [tvTab, setTvTab] = useState(0); // Active TV shows tab index
 
   const navigate = useNavigate();
 
+  /**
+   * Initial Data Fetching
+   * Loads popular movies and TV shows when component mounts
+   * Sets the first movie as current featured item
+   */
   useEffect(() => {
     const fetchInitialData = async () => {
       setLoading(true);
       try {
+        // Fetch and process popular movies
         const moviesData = await MainService.getPopularMovies();
         const movieInstances = (moviesData || []).map((movieData) => new Movie(movieData));
         setPopularMovies(movieInstances);
         setCurrentMovie(movieInstances[0] || null);
 
+        // Fetch and process popular TV shows
         const tvData = await MainService.getPopularTvShows();
         const tVShowInstances = (tvData || []).map((tvShowData) => new TVShow(tvShowData));
         setPopularTVShows(tVShowInstances);
@@ -44,6 +70,11 @@ const HomePage = () => {
     fetchInitialData();
   }, []);
 
+  /**
+   * Fetches movie data based on tab selection
+   * Implements lazy loading - only fetches when tab is selected
+   * @param {number} tabIndex - The selected tab index
+   */
   const fetchMoviesData = async (tabIndex) => {
     try {
       if (tabIndex === 1 && topRatedMovies.length === 0) {
@@ -60,6 +91,11 @@ const HomePage = () => {
     }
   };
 
+  /**
+   * Fetches TV show data based on tab selection
+   * Implements lazy loading - only fetches when tab is selected
+   * @param {number} tabIndex - The selected tab index
+   */
   const fetchTvData = async (tabIndex) => {
     try {
       if (tabIndex === 1 && topRatedTVShows.length === 0) {
@@ -76,6 +112,7 @@ const HomePage = () => {
     }
   };
 
+  // Tab change handlers
   const handleMovieTabChange = (event, newValue) => {
     setMovieTab(newValue);
   };
@@ -84,19 +121,32 @@ const HomePage = () => {
     setTvTab(newValue);
   };
 
+  // Search handler (currently logs to console)
   const handleSearch = (query) => {
     console.log('Search triggered with query:', query);
   };
 
+  /**
+   * Navigation handler for category pages
+   * @param {string} topic - The category title
+   * @param {Array} mediaArray - The media items to display
+   * @param {string} fetchFunction - The API function name for pagination
+   */
   const handleNavigate = (topic, mediaArray, fetchFunction) => {
     navigate(`/info/${topic}`, { state: { mediaArray, fetchFunction } });
   };
 
+  // Determine current carousel items based on active tab
   const movieCarouselItems =
     movieTab === 0 ? popularMovies : movieTab === 1 ? topRatedMovies : upcomingMovies;
   const tVShowCarouselItems =
     tvTab === 0 ? popularTVShows : tvTab === 1 ? topRatedTVShows : onAirTVShows;
 
+  /**
+   * Double-click handler for movie tabs
+   * Navigates to full category page
+   * @param {number} tabIndex - The clicked tab index
+   */
   const handleMovieTabDoubleClick = (tabIndex) => {
     const topic =
       tabIndex === 0
@@ -113,6 +163,11 @@ const HomePage = () => {
     handleNavigate(topic, movieCarouselItems, fetchFunction);
   };
 
+  /**
+   * Double-click handler for TV tabs
+   * Navigates to full category page
+   * @param {number} tabIndex - The clicked tab index
+   */
   const handleTvTabDoubleClick = (tabIndex) => {
     const topic =
       tabIndex === 0
@@ -131,6 +186,7 @@ const HomePage = () => {
 
   return (
     <Container>
+      {/* Page Header */}
       <Box display="flex" alignItems="center" justifyContent="space-between">
         <Typography 
           variant="h3" 
@@ -138,7 +194,7 @@ const HomePage = () => {
           gutterBottom
           sx={{
             '@media (max-width: 400px)': {
-              fontSize: 'h5.fontSize'
+              fontSize: 'h5.fontSize' // Responsive font scaling
             }
           }}
         >
@@ -147,16 +203,19 @@ const HomePage = () => {
       </Box>
 
       {loading ? (
+        // Loading State
         <Box display="flex" justifyContent="center" alignItems="center" mt={4}>
           <CircularProgress />
         </Box>
       ) : (
+        // Main Content
         <Box mt={4}>
+          {/* Featured Movie Carousel with Search Overlay */}
           <Box sx={{ position: 'relative', width: '100%', height: '70vh', mb: 6 }}>
             <MediaDisplayCarousel
               mediaItems={popularMovies || []}
               autoPlay={true}
-              interval={5000}
+              interval={5000} // 5 second rotation
               onItemChange={(item) => setCurrentMovie(item)}
             />
             <Box
@@ -165,7 +224,7 @@ const HomePage = () => {
                 top: '45%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: { xs: '90%', sm: '70%', md: '50%' },
+                width: { xs: '90%', sm: '70%', md: '50%' }, // Responsive width
                 zIndex: 2,
                 borderRadius: 2,
                 padding: 2,
@@ -175,12 +234,13 @@ const HomePage = () => {
             </Box>
           </Box>
 
+          {/* Movies Section */}
           <Typography 
             variant="h4" 
             gutterBottom 
             sx={{
               '@media (max-width: 720px)': {
-                textAlign: 'center'
+                textAlign: 'center' // Mobile center alignment
               }
             }}
           >
@@ -264,7 +324,7 @@ const HomePage = () => {
             >
               <Tab
                 label="Popular"
-                onMouseEnter={() => fetchMoviesData(0)}
+                onMouseEnter={() => fetchMoviesData(0)} // Prefetch on hover
                 onDoubleClick={() => handleMovieTabDoubleClick(0)}
               />
               <Tab
@@ -281,7 +341,7 @@ const HomePage = () => {
           </Box>
           <Box sx={{ 
             '@media (max-width: 720px)': {
-              transform: 'translateY(-45px)'
+              transform: 'translateY(-45px)' // Mobile layout adjustment
             }
           }}>
             <DisplayCardCarousel
@@ -292,6 +352,7 @@ const HomePage = () => {
             />
           </Box>
 
+          {/* TV Shows Section */}
           <Typography 
             variant="h4" 
             gutterBottom 

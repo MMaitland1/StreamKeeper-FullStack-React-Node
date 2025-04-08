@@ -1,122 +1,138 @@
+/**
+ * SearchResultsPage.js
+ * 
+ * Displays search results across multiple media types (movies, TV shows, people)
+ * 
+ * Features:
+ * - Fetches and displays unified search results
+ * - Processes different media types appropriately
+ * - Shows loading state during data fetch
+ * - Handles empty results and errors
+ */
+
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom'; // Hook to access URL parameters
 import { Box, CircularProgress, Typography } from '@mui/material';
 import MainService from '../services/MainService'; // Service for API requests
-import Movie from '../models/Movie'; // Movie model
-import TVShow from '../models/TvShow'; // TVShow model
-import Person from '../models/Person'; // Person model
-import Media from '../models/Media'; // Generic Media model
-import DisplayCardA from '../components/DisplayCardA/DisplayCardA'; // Component for displaying media items
-import SearchBar from '../components/SearchBar/SearchBar'; // Search bar component
+import Movie from '../models/Movie'; // Movie model class
+import TVShow from '../models/TvShow'; // TVShow model class
+import Person from '../models/Person'; // Person model class
+import Media from '../models/Media'; // Generic Media model class
+import DisplayCardA from '../components/DisplayCardA/DisplayCardA'; // Component for media cards
+import SearchBar from '../components/SearchBar/SearchBar'; // Search input component
 
 function SearchResultsPage() {
-  const { query } = useParams(); // Retrieve the search query from the URL
-  const [mediaArray, setMediaArray] = useState([]); // State to store search results
-  const [loading, setLoading] = useState(true); // State to manage loading state
+  // Get search query from URL parameters
+  const { query } = useParams();
 
-  // Fetch search results when the component mounts or when the query changes
+  // State to store processed search results
+  const [mediaArray, setMediaArray] = useState([]);
+  // State to track loading status
+  const [loading, setLoading] = useState(true);
+
+  /**
+   * useEffect hook for fetching and processing search results
+   * Runs when component mounts or when search query changes
+   */
   useEffect(() => {
     const fetchSearchResults = async () => {
-      setLoading(true); // Start loading
+      setLoading(true); // Activate loading state
       try {
-        // Fetch search results using the service
+        // Fetch raw search results from API
         const data = await MainService.multiSearch(query);
-
         const resultsArray = data?.searchResults;
-        // Ensure the results are an array before proceeding
+
+        // Validate API response format
         if (!Array.isArray(resultsArray)) {
           console.error('Expected an array but got:', data);
-          setMediaArray([]); // Clear results if invalid data is received
+          setMediaArray([]);
           return;
         }
 
-        // Process each search result based on its media type
+        // Process each result based on media type
         const processedMediaArray = await Promise.all(
           resultsArray.map(async (result) => {
             let mediaInstance;
-            const mediaType = result.mediaType?.toLowerCase(); // Normalize media type to lowercase
+            const mediaType = result.mediaType?.toLowerCase(); // Normalize media type
 
+            // Create appropriate model instance
             switch (mediaType) {
               case 'movie':
-                mediaInstance = new Movie(result); // Create a Movie instance
+                mediaInstance = new Movie(result);
                 break;
               case 'tvshow':
-                mediaInstance = new TVShow(result); // Create a TVShow instance
+                mediaInstance = new TVShow(result);
                 break;
               case 'person':
-                mediaInstance = new Person(result); // Create a Person instance
+                mediaInstance = new Person(result);
                 try {
-                  // Fetch additional image data for persons
+                  // Fetch additional images for person results
                   const imagesData = await MainService.getPersonImages(result.id);
-                  if (imagesData.profiles && imagesData.profiles.length > 0) {
-                    mediaInstance.imageUrl = `https://image.tmdb.org/t/p/w500${imagesData.profiles[0].file_path}`;
-                  } else {
-                    mediaInstance.imageUrl = 'placeholder.jpg'; // Fallback image
-                  }
+                  mediaInstance.imageUrl = imagesData.profiles?.length
+                    ? `https://image.tmdb.org/t/p/w500${imagesData.profiles[0].file_path}`
+                    : 'placeholder.jpg';
                 } catch (error) {
                   console.error(`Error fetching images for person ID ${result.id}:`, error);
-                  mediaInstance.imageUrl = 'placeholder.jpg'; // Fallback image on error
+                  mediaInstance.imageUrl = 'placeholder.jpg';
                 }
                 break;
               default:
-                // Handle unhandled media types
                 console.warn('Unhandled mediaType:', result.mediaType);
-                mediaInstance = new Media(result); // Fallback to a generic Media instance
+                mediaInstance = new Media(result);
             }
             return mediaInstance;
           })
         );
 
-        setMediaArray(processedMediaArray); // Update state with processed results
+        setMediaArray(processedMediaArray);
       } catch (error) {
-        console.error('Error fetching search results:', error); // Log any errors
-        setMediaArray([]); // Clear results on error
+        console.error('Error fetching search results:', error);
+        setMediaArray([]);
       } finally {
-        setLoading(false); // End loading
+        setLoading(false); // Deactivate loading state
       }
     };
 
-    if (query) fetchSearchResults(); // Call the function if a query exists
-  }, [query]); // Dependency array ensures this runs when the query changes
+    if (query) fetchSearchResults();
+  }, [query]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, p: 3 }}>
-      {/* Render the search bar with the current query as default value */}
+      {/* Search bar with current query as default value */}
       <Box sx={{ width: '100%', maxWidth: 600 }}>
         <SearchBar defaultValue={query} />
       </Box>
-      {/* Display the search query as a heading */}
+
+      {/* Search results heading */}
       <Typography variant="h4" align="center" sx={{ mt: 2 }}>
         Search Results for "{query}"
       </Typography>
+
+      {/* Conditional rendering based on loading state */}
       {loading ? (
-        // Show a loading spinner while results are being fetched
-        <CircularProgress />
+        <CircularProgress /> // Loading spinner
       ) : (
         <>
-          {/* Display results if available */}
+          {/* Results grid or empty state message */}
           {mediaArray.length > 0 ? (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'center' }}>
               {mediaArray.map((media) => (
                 <Box key={media.id}>
                   <DisplayCardA
-                    media={media} // Pass media data to DisplayCardA component
-                    minWidth={300} // Set minimum width for the card
-                    maxWidth={300} // Set maximum width for the card
-                    minHeight={500} // Set minimum height for the card
-                    maxHeight={500} // Set maximum height for the card
+                    media={media}
+                    minWidth={300}
+                    maxWidth={300}
+                    minHeight={500}
+                    maxHeight={500}
                   />
                 </Box>
               ))}
             </Box>
           ) : (
-            // Display a message if no results are found
             <Typography variant="body1" color="textSecondary">
               No results found for "{query}".
             </Typography>
           )}
-
-          
         </>
       )}
     </Box>

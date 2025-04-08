@@ -1,3 +1,7 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Tooltip from '@mui/material/Tooltip';
+
 /**
  * BrowseCard.js
  * A responsive, interactive card component for media browsing
@@ -8,11 +12,6 @@
  * - Dynamic text scaling
  * - Tooltip information
  */
-
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Tooltip from '@mui/material/Tooltip';
-
 /**
  * BrowseCard Component
  * @param {string} topic - Card title/category
@@ -101,7 +100,7 @@ const BrowseCard = ({
                     {
                         name: 'offset',
                         options: {
-                            offset: [0, 10], // Offset from trigger element
+                            offset: [0, 10], 
                         },
                     },
                 ],
@@ -148,7 +147,7 @@ const BrowseCard = ({
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent overlay
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)', 
                         zIndex: 1,
                         display: 'flex',
                         alignItems: 'center',
@@ -158,7 +157,7 @@ const BrowseCard = ({
                 >
                     <h2 style={{ 
                         color: 'white', 
-                        fontSize: `${Math.max(16, dimensions.width * 0.08)}px`, // Responsive font sizing
+                        fontSize: `${Math.max(16, dimensions.width * 0.08)}px`, 
                         margin: 0,
                         textAlign: 'center',
                         padding: '0 10px'

@@ -5,8 +5,28 @@ import { useNavigate } from 'react-router-dom';
 import MainService from '../../services/MainService';
 import PrefetchService from '../../services/PrefetchService';
 
-const prefetchService = PrefetchService; // Singleton service instance
+const prefetchService = PrefetchService; 
 
+/**
+ * DisplayCardA Component
+ * A reusable card component to display media-related information (Movies, TV Shows, and People).
+ * 
+ * Features:
+ * - Fetches additional images for people if media type is 'Person'.
+ * - Provides a hover effect and navigation to detailed media pages.
+ * - Shows ratings and brief descriptions.
+ * - Supports dynamic width and height adjustments.
+ *
+ * @param {Object} media - Media object containing details like title, type, images, and rating.
+ * @param {number} [minWidth=275] - Minimum width of the card.
+ * @param {number} [maxWidth] - Maximum width of the card.
+ * @param {number} [minHeight=300] - Minimum height of the card.
+ * @param {number} [maxHeight] - Maximum height of the card.
+ * @param {number} [fixedWidth] - Fixed width if defined.
+ * @param {number} [fixedHeight] - Fixed height if defined.
+ * @param {Function} [onClick] - Custom click event handler.
+ * @param {boolean} [disableClick=false] - Disables click functionality when set to true.
+ */
 function DisplayCardA({
   media,
   minWidth = 275,
@@ -21,8 +41,11 @@ function DisplayCardA({
   const navigate = useNavigate();
   const [personImages, setPersonImages] = useState(null);
 
+  /**
+   * Fetch additional images if the media type is 'Person'.
+   * This retrieves profile pictures from the TMDB API.
+   */
   useEffect(() => {
-    // Fetch person images only if the media type is 'Person'
     if (media.mediaType === 'Person') {
       const fetchPersonImages = async () => {
         try {
@@ -40,6 +63,11 @@ function DisplayCardA({
     }
   }, [media]);
 
+  /**
+   * Handles click events on the card.
+   * If a custom click handler is provided, it will be executed.
+   * Otherwise, it navigates to the corresponding media details page.
+   */
   const handleCardClick = () => {
     if (disableClick) return;
 
@@ -64,13 +92,19 @@ function DisplayCardA({
     }
   };
 
+  /**
+   * Handles hover events for prefetching media data.
+   * Prefetching improves user experience by loading details in advance.
+   */
   const handleMouseEnter = () => {
     if (['Movie', 'TvShow', 'Person'].includes(media.mediaType)) {
       prefetchService.executePrefetch(media.mediaType, media.mediaType, media.id);
-
     }
   };
 
+  /**
+   * Extracts and formats media details such as title, description, and images.
+   */
   const {
     mediaType = 'Media Type',
     name = media.title || media.name || 'Unnamed',
@@ -87,11 +121,18 @@ function DisplayCardA({
       media.mediaType === 'Person' ? personImages : media.posterUrl || media.backdropUrl || '',
   } = media;
 
+  /**
+   * Constructs the "Known For" section for people.
+   */
   const knownFor =
     media.mediaType === 'Person' && media.knownFor
       ? media.knownFor.slice(0, 2).map(item => item.name || item.title).join(', ')
       : '';
 
+  /**
+   * Styling object for the card container.
+   * Uses background images, hover effects, and dynamic dimensions.
+   */
   const cardStyles = {
     backgroundImage: `url(${backgroundUrl})`,
     backgroundSize: 'cover',
@@ -117,6 +158,7 @@ function DisplayCardA({
 
   return (
     <Box sx={cardStyles} onClick={handleCardClick} onMouseEnter={handleMouseEnter}>
+      {/* Dark overlay for readability */}
       <Box
         sx={{
           position: 'absolute',
@@ -156,6 +198,7 @@ function DisplayCardA({
           )}
         </CardContent>
       </Card>
+      {/* Rating section */}
       <Box
         sx={{
           display: 'flex',
